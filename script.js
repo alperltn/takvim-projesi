@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
 import { getFirestore, doc, setDoc, getDocs, collection, deleteDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
-
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
 // ============================================
 // Firebase Initialization
 // ============================================
@@ -16,7 +16,7 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-
+const auth = getAuth(app);
 // Global variable to access calendar instance
 let calendarInstance;
 
@@ -415,4 +415,81 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Load notes from Firestore on page load
     await calendarInstance.loadNotesFromFirestore();
     calendarInstance.render();
+});
+
+// ==========================================
+// KİMLİK DOĞRULAMA (AUTHENTICATION) İŞLEMLERİ
+// ==========================================
+
+const emailInput = document.getElementById('email-input');
+const passwordInput = document.getElementById('password-input');
+const registerBtn = document.getElementById('register-btn');
+const loginBtn = document.getElementById('login-btn');
+const logoutBtn = document.getElementById('logout-btn');
+const userStatus = document.getElementById('user-status');
+
+// 1. Kayıt Olma İşlemi
+registerBtn.addEventListener('click', () => {
+    const email = emailInput.value;
+    const password = passwordInput.value;
+    
+    if(!email || !password) {
+        alert("Lütfen e-posta ve şifre girin!");
+        return;
+    }
+
+    createUserWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+            alert("Hesap başarıyla oluşturuldu! Hoş geldin.");
+        })
+        .catch((error) => {
+            alert("Kayıt Hatası: " + error.message);
+        });
+});
+
+// 2. Giriş Yapma İşlemi
+loginBtn.addEventListener('click', () => {
+    const email = emailInput.value;
+    const password = passwordInput.value;
+    
+    if(!email || !password) {
+        alert("Lütfen e-posta ve şifre girin!");
+        return;
+    }
+
+    signInWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+            alert("Başarıyla giriş yapıldı!");
+        })
+        .catch((error) => {
+            alert("Giriş Hatası: " + error.message);
+        });
+});
+
+// 3. Çıkış Yapma İşlemi
+logoutBtn.addEventListener('click', () => {
+    signOut(auth).then(() => {
+        alert("Çıkış yapıldı.");
+    });
+});
+
+// 4. Kullanıcı Durumunu Dinleme (Giriş yaptı mı, yapmadı mı?)
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        // Kullanıcı giriş yapmışsa arayüzü güncelle
+        userStatus.textContent = "Hoş geldin, " + user.email;
+        loginBtn.style.display = 'none';
+        registerBtn.style.display = 'none';
+        emailInput.style.display = 'none';
+        passwordInput.style.display = 'none';
+        logoutBtn.style.display = 'inline-block';
+    } else {
+        // Kullanıcı giriş yapmamışsa
+        userStatus.textContent = "Giriş Yapılmadı";
+        loginBtn.style.display = 'inline-block';
+        registerBtn.style.display = 'inline-block';
+        emailInput.style.display = 'inline-block';
+        passwordInput.style.display = 'inline-block';
+        logoutBtn.style.display = 'none';
+    }
 });
