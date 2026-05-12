@@ -1,0 +1,721 @@
+/* ============================================
+   Global Styles & Variables (Dark Mode Default)
+   ============================================ */
+
+:root {
+    --primary-bg: #1a1a1a;
+    --secondary-bg: #2d2d2d;
+    --tertiary-bg: #3a3a3a;
+    --text-primary: #ffffff;
+    --text-secondary: #b0b0b0;
+    --accent: #6366f1;
+    --accent-light: #818cf8;
+    --accent-hover: #4f46e5;
+    --border-color: #404040;
+    --today-bg: #6366f1;
+    --today-text: #ffffff;
+    --weekend-bg: #252525;
+    --other-month-text: #666666;
+    --transition: 0.3s ease;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    font-size: 16px;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+    color: var(--text-primary);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    transition: background var(--transition);
+}
+
+/* ============================================
+   Container & Calendar Layout
+   ============================================ */
+
+.container {
+    width: 100%;
+    max-width: 900px;
+}
+
+.calendar-wrapper {
+    background: var(--secondary-bg);
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+    transition: box-shadow var(--transition);
+}
+
+.calendar-wrapper:hover {
+    box-shadow: 0 25px 70px rgba(99, 102, 241, 0.2);
+}
+
+/* ============================================
+   Header Section
+   ============================================ */
+
+.calendar-header {
+    background: linear-gradient(135deg, #2d2d2d 0%, #3a3a3a 100%);
+    padding: 30px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid var(--border-color);
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.month-year {
+    flex: 1;
+    text-align: center;
+    min-width: 200px;
+}
+
+.month-year h1 {
+    font-size: 1.8rem;
+    font-weight: 600;
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: 0.5px;
+}
+
+/* ============================================
+   Navigation Buttons
+   ============================================ */
+
+.btn-nav {
+    background: var(--tertiary-bg);
+    border: 2px solid var(--border-color);
+    color: var(--text-primary);
+    width: 45px;
+    height: 45px;
+    border-radius: 8px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition);
+    font-weight: bold;
+}
+
+.btn-nav:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    transform: scale(1.05);
+}
+
+.btn-nav:active {
+    transform: scale(0.95);
+}
+
+/* ============================================
+   Weekday Headers
+   ============================================ */
+
+.weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 0;
+    background: var(--tertiary-bg);
+    padding: 15px 20px;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.weekday {
+    text-align: center;
+    font-weight: 600;
+    color: var(--accent-light);
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 10px 0;
+}
+
+/* ============================================
+   Calendar Grid (7x5 Format)
+   ============================================ */
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 2px;
+    padding: 10px;
+    background: var(--primary-bg);
+    min-height: 500px;
+}
+
+.day {
+    background: var(--secondary-bg);
+    border: 1px solid var(--border-color);
+    padding: 12px 8px;
+    height: 175px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    transition: all var(--transition);
+    position: relative;
+    overflow: hidden;
+}
+
+.day::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, transparent 0%, rgba(99, 102, 241, 0.1) 100%);
+    opacity: 0;
+    transition: opacity var(--transition);
+    pointer-events: none;
+}
+
+.day:hover {
+    background: var(--tertiary-bg);
+    border-color: var(--accent);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(99, 102, 241, 0.2);
+}
+
+.day:hover::before {
+    opacity: 1;
+}
+
+/* Day Number */
+.day-number {
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: var(--accent-light);
+    margin-bottom: 4px;
+    z-index: 1;
+}
+
+/* Weekend Days */
+.day.weekend {
+    background: var(--weekend-bg);
+}
+
+/* Other Month Days */
+.day.other-month {
+    background: var(--primary-bg);
+    border-color: var(--border-color);
+}
+
+.day.other-month .day-number {
+    color: var(--other-month-text);
+}
+
+/* Today Highlight */
+.day.today {
+    background: var(--secondary-bg);
+    border: 3px solid var(--accent);
+    box-shadow: none;
+}
+
+.day.today .day-number {
+    color: var(--accent);
+    font-weight: 700;
+}
+
+.day.today::after {
+    content: '';
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+    bottom: 8px;
+    right: 8px;
+}
+
+/* Selected Day */
+.day.selected {
+    background: var(--secondary-bg);
+    border: 1px solid var(--border-color);
+}
+
+/* ============================================
+   Footer Section
+   ============================================ */
+
+.calendar-footer {
+    background: var(--tertiary-bg);
+    padding: 20px;
+    border-top: 2px solid var(--border-color);
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.btn-today {
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
+    border: none;
+    color: var(--today-text);
+    padding: 12px 30px;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition);
+    letter-spacing: 0.5px;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
+.btn-today:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(99, 102, 241, 0.5);
+    background: linear-gradient(135deg, var(--accent-hover) 0%, var(--accent) 100%);
+}
+
+.btn-today:active {
+    transform: translateY(0);
+}
+
+/* ============================================
+   Responsive Design
+   ============================================ */
+
+/* Tablet Screens (768px and below) */
+@media (max-width: 768px) {
+    html {
+        font-size: 14px;
+    }
+
+    .calendar-header {
+        padding: 20px 15px;
+        gap: 10px;
+    }
+
+    .month-year h1 {
+        font-size: 1.4rem;
+    }
+
+    .btn-nav {
+        width: 40px;
+        height: 40px;
+        font-size: 1rem;
+    }
+
+    .day {
+        min-height: 60px;
+        padding: 10px 6px;
+    }
+
+    .day-number {
+        font-size: 1rem;
+    }
+
+    .weekdays {
+        padding: 12px 15px;
+    }
+
+    .weekday {
+        font-size: 0.8rem;
+    }
+
+    .calendar-grid {
+        padding: 8px;
+        gap: 1px;
+    }
+}
+
+/* Mobile Screens (480px and below) */
+@media (max-width: 480px) {
+    html {
+        font-size: 13px;
+    }
+
+    body {
+        padding: 10px;
+    }
+
+    .calendar-header {
+        padding: 15px 10px;
+        gap: 8px;
+    }
+
+    .month-year h1 {
+        font-size: 1.2rem;
+        margin: 0;
+    }
+
+    .btn-nav {
+        width: 36px;
+        height: 36px;
+        font-size: 0.9rem;
+    }
+
+    .calendar-wrapper {
+        border-radius: 12px;
+    }
+
+    .day {
+        min-height: 50px;
+        padding: 8px 4px;
+        border-radius: 6px;
+    }
+
+    .day-number {
+        font-size: 0.9rem;
+        margin-bottom: 2px;
+    }
+
+    .weekdays {
+        padding: 10px 10px;
+        gap: 0;
+    }
+
+    .weekday {
+        font-size: 0.7rem;
+        padding: 8px 0;
+    }
+
+    .calendar-grid {
+        padding: 6px;
+        gap: 1px;
+        min-height: 400px;
+    }
+
+    .btn-today {
+        padding: 10px 20px;
+        font-size: 0.9rem;
+    }
+
+    .calendar-footer {
+        padding: 15px 10px;
+    }
+}
+
+/* ============================================
+   Light Mode (Optional - Can be toggled)
+   ============================================ */
+
+body.light-mode {
+    --primary-bg: #f8f9fa;
+    --secondary-bg: #ffffff;
+    --tertiary-bg: #f0f0f0;
+    --text-primary: #1a1a1a;
+    --text-secondary: #666666;
+    --accent: #6366f1;
+    --accent-light: #818cf8;
+    --accent-hover: #4f46e5;
+    --border-color: #e0e0e0;
+    --weekend-bg: #f5f5f5;
+    --other-month-text: #cccccc;
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+}
+
+body.light-mode .calendar-wrapper {
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+}
+
+body.light-mode .calendar-wrapper:hover {
+    box-shadow: 0 25px 70px rgba(99, 102, 241, 0.1);
+}
+
+body.light-mode .calendar-header {
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+}
+
+body.light-mode .day:hover {
+    box-shadow: 0 8px 16px rgba(99, 102, 241, 0.1);
+}
+
+/* ============================================
+   Animations
+   ============================================ */
+
+@keyframes slideInDay {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.day {
+    animation: slideInDay 0.3s ease;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.7;
+    }
+}
+
+.day.today {
+    animation: pulse 2s ease-in-out infinite;
+}
+
+/* ============================================
+   Note Preview in Day
+   ============================================ */
+
+.note-preview {
+    display: -webkit-box;
+    font-size: 0.9rem;
+    color: var(--text-primary);
+    margin-top: 4px;
+    white-space: pre-wrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    line-height: 1.2;
+    font-weight: 500;
+    word-wrap: break-word;
+    -webkit-line-clamp: 6;
+    -webkit-box-orient: vertical;
+}
+
+/* ============================================
+   Modal Styles
+   ============================================ */
+
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.3s ease;
+}
+
+.modal-overlay.active {
+    display: flex;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.modal {
+    background: var(--secondary-bg);
+    border-radius: 12px;
+    box-shadow: 0 30px 100px rgba(0, 0, 0, 0.7);
+    border: 1px solid var(--border-color);
+    width: 90%;
+    max-width: 500px;
+    animation: slideUp 0.3s ease;
+    z-index: 1001;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Modal Header */
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 25px;
+    border-bottom: 2px solid var(--border-color);
+    background: linear-gradient(135deg, #2d2d2d 0%, #3a3a3a 100%);
+    border-radius: 12px 12px 0 0;
+}
+
+.modal-header h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: 0.5px;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 2rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    transition: all var(--transition);
+    padding: 0;
+    line-height: 1;
+}
+
+.modal-close:hover {
+    background: var(--tertiary-bg);
+    color: var(--text-primary);
+    transform: rotate(90deg);
+}
+
+/* Modal Body */
+.modal-body {
+    padding: 25px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.note-textarea {
+    width: 100%;
+    padding: 15px;
+    background: var(--tertiary-bg);
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-family: inherit;
+    font-size: 1rem;
+    resize: vertical;
+    transition: all var(--transition);
+    outline: none;
+}
+
+.note-textarea:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    background: var(--secondary-bg);
+}
+
+.note-textarea::placeholder {
+    color: var(--text-secondary);
+}
+
+.char-count {
+    text-align: right;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+/* Modal Footer */
+.modal-footer {
+    display: flex;
+    gap: 12px;
+    padding: 20px 25px;
+    border-top: 2px solid var(--border-color);
+    justify-content: flex-end;
+    background: var(--primary-bg);
+    border-radius: 0 0 12px 12px;
+}
+
+.btn-cancel,
+.btn-save {
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all var(--transition);
+    letter-spacing: 0.5px;
+}
+
+.btn-cancel {
+    background: var(--tertiary-bg);
+    color: var(--text-primary);
+    border: 2px solid var(--border-color);
+}
+
+.btn-cancel:hover {
+    background: var(--border-color);
+    border-color: var(--text-secondary);
+}
+
+.btn-cancel:active {
+    transform: scale(0.95);
+}
+
+.btn-save {
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
+    color: var(--today-text);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
+.btn-save:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(99, 102, 241, 0.5);
+    background: linear-gradient(135deg, var(--accent-hover) 0%, var(--accent) 100%);
+}
+
+.btn-save:active {
+    transform: translateY(0);
+}
+
+/* ============================================
+   Modal Responsive Design
+   ============================================ */
+
+@media (max-width: 480px) {
+    .modal {
+        width: 95%;
+        max-width: none;
+    }
+
+    .modal-header {
+        padding: 20px;
+    }
+
+    .modal-header h2 {
+        font-size: 1.3rem;
+    }
+
+    .modal-body {
+        padding: 20px;
+    }
+
+    .note-textarea {
+        min-height: 120px;
+    }
+
+    .modal-footer {
+        flex-direction: column-reverse;
+        gap: 10px;
+        padding: 15px 20px;
+    }
+
+    .btn-cancel,
+    .btn-save {
+        width: 100%;
+        padding: 14px;
+    }
+}
