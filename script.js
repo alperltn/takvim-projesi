@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
 import { getFirestore, doc, setDoc, getDocs, collection, deleteDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
 // ============================================
 // Firebase Initialization
 // ============================================
@@ -421,6 +421,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 // KİMLİK DOĞRULAMA (AUTHENTICATION) İŞLEMLERİ
 // ==========================================
 
+const usernameInput = document.getElementById('username-input');
 const emailInput = document.getElementById('email-input');
 const passwordInput = document.getElementById('password-input');
 const registerBtn = document.getElementById('register-btn');
@@ -430,17 +431,23 @@ const userStatus = document.getElementById('user-status');
 
 // 1. Kayıt Olma İşlemi
 registerBtn.addEventListener('click', () => {
+    const username = usernameInput.value.trim();
     const email = emailInput.value;
     const password = passwordInput.value;
     
-    if(!email || !password) {
-        alert("Lütfen e-posta ve şifre girin!");
+    if(!username || !email || !password) {
+        alert("Lütfen kullanıcı adı, e-posta ve şifre girin!");
         return;
     }
 
     createUserWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
-            alert("Hesap başarıyla oluşturuldu! Hoş geldin.");
+            return updateProfile(userCredential.user, {
+                displayName: username
+            });
+        })
+        .then(() => {
+            alert(`Hoş geldin, ${username}`);
         })
         .catch((error) => {
             alert("Kayıt Hatası: " + error.message);
@@ -477,9 +484,10 @@ logoutBtn.addEventListener('click', () => {
 onAuthStateChanged(auth, (user) => {
     if (user) {
         // Kullanıcı giriş yapmışsa arayüzü güncelle
-        userStatus.textContent = "Hoş geldin, " + user.email;
+        userStatus.textContent = "Hoş geldin, " + (user.displayName || user.email);
         loginBtn.style.display = 'none';
         registerBtn.style.display = 'none';
+        usernameInput.style.display = 'none';
         emailInput.style.display = 'none';
         passwordInput.style.display = 'none';
         logoutBtn.style.display = 'inline-block';
