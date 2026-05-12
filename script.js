@@ -342,12 +342,7 @@ class NoteModal {
         // Save button click
         this.saveBtn.addEventListener('click', () => this.saveNote());
         
-        // Close on overlay click (outside modal)
-        this.modalOverlay.addEventListener('click', (e) => {
-            if (e.target === this.modalOverlay) {
-                this.closeModal();
-            }
-        });
+
         
         // Character count update
         this.textarea.addEventListener('input', () => {
