@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-import { getFirestore, doc, setDoc, getDocs, collection } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+import { getFirestore, doc, setDoc, getDocs, collection, deleteDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
 
 // ============================================
 // Firebase Initialization
@@ -392,7 +392,9 @@ class NoteModal {
                 calendarInstance.notes[dateId] = noteText;
             } else {
                 // Delete empty note
-                console.log('⚠️ Not silinmiştir.');
+                await deleteDoc(doc(db, 'notes', dateId));
+                delete calendarInstance.notes[dateId];
+                console.log("🗑️ Not tamamen silindi!");
             }
         } catch (error) {
             console.error('❌ Firestore\'a yazarken hata oluştu:', error);
