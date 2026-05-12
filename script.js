@@ -119,7 +119,17 @@ class Calendar {
      */
     async loadNotesFromFirestore() {
         try {
-            const notesCollection = collection(db, 'notes');
+            // Check if user is logged in
+            const currentUser = auth.currentUser;
+            if (!currentUser) {
+                // If no user is logged in, clear notes
+                this.notes = {};
+                console.log('📛 Giriş yapılmadığı için notlar temizlendi.');
+                return;
+            }
+            
+            // Load notes from user-specific path: users/[USER_ID]/notes
+            const notesCollection = collection(db, 'users', currentUser.uid, 'notes');
             const querySnapshot = await getDocs(notesCollection);
             
             this.notes = {};
@@ -266,6 +276,12 @@ class Calendar {
      * Select a date and open modal
      */
     selectDate(date) {
+        // Check if user is logged in
+        if (!auth.currentUser) {
+            alert('Not eklemek için lütfen giriş yapın!');
+            return;
+        }
+        
         this.selectedDate = date;
         this.openNoteModal(date);
     }
@@ -374,12 +390,21 @@ class NoteModal {
         const modalTitle = document.getElementById('modalTitle').textContent;
         const selectedDateData = JSON.parse(this.modalOverlay.dataset.selectedDate);
         const dateId = `${selectedDateData.year}-${String(selectedDateData.month + 1).padStart(2, '0')}-${String(selectedDateData.day).padStart(2, '0')}`;
+        const currentUser = auth.currentUser;
+        
+        // Check if user is logged in
+        if (!currentUser) {
+            alert('Not kaydetmek için lütfen giriş yapın!');
+            return;
+        }
         
         try {
+            // Save to user-specific path: users/[USER_ID]/notes
             if (noteText) {
                 // Save to Firestore
-                await setDoc(doc(db, 'notes', dateId), { text: noteText });
+                await setDoc(doc(db, 'users', currentUser.uid, 'notes', dateId), { text: noteText });
                 console.log('🔥 FIRESTORE\'A YAZILDI!');
+                console.log('Kullanıcı:', currentUser.uid);
                 console.log('Tarih:', dateId);
                 console.log('Not İçeriği:', noteText);
                 
@@ -387,7 +412,7 @@ class NoteModal {
                 calendarInstance.notes[dateId] = noteText;
             } else {
                 // Delete empty note
-                await deleteDoc(doc(db, 'notes', dateId));
+                await deleteDoc(doc(db, 'users', currentUser.uid, 'notes', dateId));
                 delete calendarInstance.notes[dateId];
                 console.log("🗑️ Not tamamen silindi!");
             }
@@ -481,7 +506,7 @@ logoutBtn.addEventListener('click', () => {
 });
 
 // 4. Kullanıcı Durumunu Dinleme (Giriş yaptı mı, yapmadı mı?)
-onAuthStateChanged(auth, (user) => {
+onAuthStateChanged(auth, async (user) => {
     if (user) {
         // Kullanıcı giriş yapmışsa arayüzü güncelle
         userStatus.textContent = "Hoş geldin, " + (user.displayName || user.email);
@@ -491,13 +516,26 @@ onAuthStateChanged(auth, (user) => {
         emailInput.style.display = 'none';
         passwordInput.style.display = 'none';
         logoutBtn.style.display = 'inline-block';
+        
+        // Load user's notes when logged in
+        if (calendarInstance) {
+            await calendarInstance.loadNotesFromFirestore();
+            calendarInstance.render();
+        }
     } else {
         // Kullanıcı giriş yapmamışsa
         userStatus.textContent = "Giriş Yapılmadı";
         loginBtn.style.display = 'inline-block';
         registerBtn.style.display = 'inline-block';
+        usernameInput.style.display = 'inline-block';
         emailInput.style.display = 'inline-block';
         passwordInput.style.display = 'inline-block';
         logoutBtn.style.display = 'none';
+        
+        // Clear notes when logged out
+        if (calendarInstance) {
+            calendarInstance.notes = {};
+            calendarInstance.render();
+        }
     }
 });
