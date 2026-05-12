@@ -6,7 +6,7 @@ import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, si
 // ============================================
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCRtRsjUFYfg6gPOLGNrtwOHcfOp5IJokg",
+  apiKey: "AIzaSyCRtRsjUFYfg6gPOLGNrtwOHcf0p5IJokg",
   authDomain: "takvim-projesi-8abe3.firebaseapp.com",
   projectId: "takvim-projesi-8abe3",
   storageBucket: "takvim-projesi-8abe3.firebasestorage.app",
