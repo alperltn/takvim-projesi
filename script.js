@@ -2,6 +2,42 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/fireba
 import { getFirestore, doc, setDoc, getDocs, collection, deleteDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
 // ============================================
+// Toast Notification System
+// ============================================
+
+function showToast(message, type = 'success') {
+    const toastContainer = document.getElementById('toast-container');
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.textContent = message;
+    
+    toastContainer.appendChild(toast);
+    
+    // Trigger animation
+    setTimeout(() => toast.classList.add('show'), 10);
+    
+    // Auto hide after 3 seconds
+    setTimeout(() => {
+        toast.classList.add('hide');
+        setTimeout(() => {
+            if (toast.parentNode) {
+                toast.parentNode.removeChild(toast);
+            }
+        }, 300);
+    }, 3000);
+    
+    // Click to dismiss
+    toast.addEventListener('click', () => {
+        toast.classList.add('hide');
+        setTimeout(() => {
+            if (toast.parentNode) {
+                toast.parentNode.removeChild(toast);
+            }
+        }, 300);
+    });
+}
+
+// ============================================
 // Firebase Initialization
 // ============================================
 
@@ -278,7 +314,7 @@ class Calendar {
     selectDate(date) {
         // Check if user is logged in
         if (!auth.currentUser) {
-            alert('Not eklemek için lütfen giriş yapın!');
+            showToast('Not eklemek için lütfen giriş yapın!', 'error');
             return;
         }
         
@@ -394,7 +430,7 @@ class NoteModal {
         
         // Check if user is logged in
         if (!currentUser) {
-            alert('Not kaydetmek için lütfen giriş yapın!');
+            showToast('Not kaydetmek için lütfen giriş yapın!', 'error');
             return;
         }
         
@@ -403,6 +439,7 @@ class NoteModal {
             if (noteText) {
                 // Save to Firestore
                 await setDoc(doc(db, 'users', currentUser.uid, 'notes', dateId), { text: noteText });
+                showToast("Not kaydedildi!", 'success');
                 console.log('🔥 FIRESTORE\'A YAZILDI!');
                 console.log('Kullanıcı:', currentUser.uid);
                 console.log('Tarih:', dateId);
@@ -414,6 +451,7 @@ class NoteModal {
                 // Delete empty note
                 await deleteDoc(doc(db, 'users', currentUser.uid, 'notes', dateId));
                 delete calendarInstance.notes[dateId];
+                showToast("Not silindi!", 'success');
                 console.log("🗑️ Not tamamen silindi!");
             }
         } catch (error) {
@@ -461,7 +499,7 @@ registerBtn.addEventListener('click', () => {
     const password = passwordInput.value;
     
     if(!username || !email || !password) {
-        alert("Lütfen kullanıcı adı, e-posta ve şifre girin!");
+        showToast("Lütfen kullanıcı adı, e-posta ve şifre girin!", 'error');
         return;
     }
 
@@ -472,10 +510,10 @@ registerBtn.addEventListener('click', () => {
             });
         })
         .then(() => {
-            alert(`Hoş geldin, ${username}`);
+            showToast(`Hoş geldin, ${username}`, 'success');
         })
         .catch((error) => {
-            alert("Kayıt Hatası: " + error.message);
+            showToast("Kayıt Hatası: " + error.message, 'error');
         });
 });
 
@@ -485,23 +523,23 @@ loginBtn.addEventListener('click', () => {
     const password = passwordInput.value;
     
     if(!email || !password) {
-        alert("Lütfen e-posta ve şifre girin!");
+        showToast("Lütfen e-posta ve şifre girin!", 'error');
         return;
     }
 
     signInWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
-            alert("Başarıyla giriş yapıldı!");
+            showToast("Başarıyla giriş yapıldı!", 'success');
         })
         .catch((error) => {
-            alert("Giriş Hatası: " + error.message);
+            showToast("Giriş Hatası: " + error.message, 'error');
         });
 });
 
 // 3. Çıkış Yapma İşlemi
 logoutBtn.addEventListener('click', () => {
     signOut(auth).then(() => {
-        alert("Çıkış yapıldı.");
+        showToast("Çıkış yapıldı.", 'success');
     });
 });
 
