@@ -517,10 +517,15 @@ const displayUsername = document.getElementById('displayUsername');
 const displayEmail = document.getElementById('displayEmail');
 const editUsernameLink = document.getElementById('editUsernameLink');
 const editEmailLink = document.getElementById('editEmailLink');
+const editPasswordLink = document.getElementById('editPasswordLink');
 const editUsernameInput = document.getElementById('editUsernameInput');
 const editEmailInput = document.getElementById('editEmailInput');
+const editPasswordInput = document.getElementById('editPasswordInput');
 const saveUsernameBtn = document.getElementById('saveUsernameBtn');
 const saveEmailBtn = document.getElementById('saveEmailBtn');
+const savePasswordBtn = document.getElementById('savePasswordBtn');
+const profileDropdown = document.getElementById('profileDropdown');
+const dropdownLogoutBtn = document.getElementById('dropdownLogoutBtn');
 
 const authInputFields = [registerUsername, emailInput, passwordInput];
 const loginButton = document.getElementById('login-btn') || authSubmitButton;
@@ -669,6 +674,25 @@ function showEditEmailView() {
     editEmailInput.focus();
 }
 
+function showEditPasswordView() {
+    profileSettingsView?.classList.add('hidden');
+    editPasswordView?.classList.remove('hidden');
+    editPasswordInput.value = '';
+    editPasswordInput.focus();
+}
+
+function toggleProfileDropdown() {
+    if (profileDropdown) {
+        profileDropdown.classList.toggle('active');
+    }
+}
+
+function closeProfileDropdown() {
+    if (profileDropdown) {
+        profileDropdown.classList.remove('active');
+    }
+}
+
 function loadProfileDisplay() {
     const savedUsername = localStorage.getItem('profileUsername');
     const savedEmail = localStorage.getItem('profileEmail');
@@ -727,9 +751,10 @@ function setAuthMode(mode) {
 }
 
 if (profileIcon) {
-    profileIcon.addEventListener('click', () => {
+    profileIcon.addEventListener('click', (e) => {
+        e.stopPropagation();
         if (auth.currentUser) {
-            openSidebar();
+            toggleProfileDropdown();
         } else {
             setAuthMode('login');
             openAuthModal();
@@ -781,6 +806,13 @@ if (editEmailLink) {
     });
 }
 
+if (editPasswordLink) {
+    editPasswordLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        showEditPasswordView();
+    });
+}
+
 if (backToProfileFromUsernameBtn) {
     backToProfileFromUsernameBtn.addEventListener('click', () => {
         showProfileSettingsView();
@@ -789,6 +821,12 @@ if (backToProfileFromUsernameBtn) {
 
 if (backToProfileFromEmailBtn) {
     backToProfileFromEmailBtn.addEventListener('click', () => {
+        showProfileSettingsView();
+    });
+}
+
+if (backToProfileFromPasswordBtn) {
+    backToProfileFromPasswordBtn.addEventListener('click', () => {
         showProfileSettingsView();
     });
 }
@@ -823,6 +861,37 @@ if (saveEmailBtn) {
         }
     });
 }
+
+if (savePasswordBtn) {
+    savePasswordBtn.addEventListener('click', () => {
+        const newPassword = editPasswordInput.value.trim();
+        if (newPassword && newPassword.length >= 6) {
+            localStorage.setItem('profilePassword', newPassword);
+            showToast('Şifre güncellendi!', 'success');
+            showProfileSettingsView();
+        } else {
+            showToast('Lütfen en az 6 karakterlik bir şifre girin.', 'error');
+        }
+    });
+}
+
+if (dropdownLogoutBtn) {
+    dropdownLogoutBtn.addEventListener('click', async () => {
+        closeProfileDropdown();
+        try {
+            await signOut(auth);
+            showToast('Çıkış yapıldı.', 'success');
+        } catch (error) {
+            showToast('Çıkış Hatası: ' + error.message, 'error');
+        }
+    });
+}
+
+document.addEventListener('click', (e) => {
+    if (profileDropdown && !profileDropdown.contains(e.target) && !profileIcon.contains(e.target)) {
+        closeProfileDropdown();
+    }
+});
 
 const profileImageInput = document.getElementById('profileImageInput');
 const profileImagePreview = document.getElementById('profileImagePreview');

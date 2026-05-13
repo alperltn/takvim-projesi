@@ -21,9 +21,14 @@
                 
                 <div class="header-right">
                     <span id="userNameDisplay" class="user-name-display"></span>
-                    <button id="profileIcon" class="profile-icon" aria-label="Profil">
-                        <span class="profile-icon-text">👤</span>
-                    </button>
+                    <div class="profile-dropdown-container">
+                        <button id="profileIcon" class="profile-icon" aria-label="Profil">
+                            <span class="profile-icon-text">👤</span>
+                        </button>
+                        <div id="profileDropdown" class="profile-dropdown">
+                            <button id="dropdownLogoutBtn" class="dropdown-logout-btn">Çıkış Yap</button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -143,11 +148,8 @@
                 <div class="settings-field">
                     <label>Email</label>
                     <p id="displayEmail" class="profile-display-text"></p>
-                    <a href="#" id="editEmailLink" class="profile-edit-link">Email değiştirme</a>
-                </div>
-                <div class="settings-field">
-                    <label for="profilePassword">Yeni Şifre</label>
-                    <input type="password" id="profilePassword" placeholder="Değiştirmek istemiyorsanız boş bırakın" />
+                    <a href="#" id="editEmailLink" class="profile-edit-link">Email değiştir</a>
+                    <a href="#" id="editPasswordLink" class="profile-edit-link">Şifre değiştir</a>
                 </div>
                 <button id="updateProfileBtn" class="update-profile-btn">Güncelle</button>
             </div>
@@ -167,9 +169,14 @@
                 </div>
                 <button id="saveEmailBtn" class="save-edit-btn">Kaydet</button>
             </div>
-        </div>
-        <div class="sidebar-footer">
-            <button id="logoutBtn" class="logout-btn">Çıkış Yap</button>
+            <div id="editPasswordView" class="settings-panel hidden">
+                <button id="backToProfileFromPasswordBtn" class="sidebar-back-btn">← Geri</button>
+                <div class="settings-field">
+                    <label for="editPasswordInput">Yeni Şifre</label>
+                    <input type="password" id="editPasswordInput" placeholder="Yeni şifrenizi girin" />
+                </div>
+                <button id="savePasswordBtn" class="save-edit-btn">Kaydet</button>
+            </div>
         </div>
     </aside>
 
