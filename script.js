@@ -484,7 +484,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 // KİMLİK DOĞRULAMA (AUTHENTICATION) İŞLEMLERİ
 // ==========================================
 
-const usernameInput = document.getElementById('username-input');
+const registerUsername = document.getElementById('registerUsername');
+const emailInput = document.getElementById('email-input');
 const passwordInput = document.getElementById('password-input');
 const authForm = document.getElementById('authForm');
 const authModalOverlay = document.getElementById('authModalOverlay');
@@ -494,24 +495,13 @@ const toggleAuthMode = document.getElementById('toggleAuthMode');
 const profileIcon = document.getElementById('profileIcon');
 const profileMenu = document.getElementById('profileMenu');
 const signOutBtn = document.getElementById('signOutBtn');
-const userStatus = document.getElementById('user-status');
+const userNameDisplay = document.getElementById('userNameDisplay');
 let authMode = 'login';
-
-function buildAuthEmail(username) {
-    const normalized = username.trim().toLowerCase();
-    if (!normalized) {
-        throw new Error('Geçerli bir kullanıcı adı girin.');
-    }
-    if (!/^[a-z0-9._-]{3,}$/.test(normalized)) {
-        throw new Error('Kullanıcı adı yalnızca harf, rakam, ., _ ve - içerebilir.');
-    }
-    return `${normalized}@takvim.app`;
-}
 
 function openAuthModal() {
     authModalOverlay.classList.add('active');
     authModalOverlay.setAttribute('aria-hidden', 'false');
-    usernameInput.focus();
+    emailInput.focus();
 }
 
 function closeAuthModal() {
@@ -538,10 +528,13 @@ function setAuthMode(mode) {
         authModalTitle.textContent = 'Giriş Yap';
         authSubmitButton.textContent = 'Giriş Yap';
         toggleAuthMode.textContent = 'Kayıt Olun';
+        registerUsername.classList.remove('visible');
+        registerUsername.value = '';
     } else {
         authModalTitle.textContent = 'Yeni Hesap Oluştur';
         authSubmitButton.textContent = 'Kayıt Ol';
         toggleAuthMode.textContent = 'Giriş Yapın';
+        registerUsername.classList.add('visible');
     }
 }
 
@@ -566,19 +559,11 @@ signOutBtn.addEventListener('click', async () => {
 
 authForm.addEventListener('submit', async (event) => {
     event.preventDefault();
-    const username = usernameInput.value.trim();
+    const email = emailInput.value.trim();
     const password = passwordInput.value;
 
-    if (!username || !password) {
-        showToast('Lütfen kullanıcı adı ve şifre girin!', 'error');
-        return;
-    }
-
-    let email;
-    try {
-        email = buildAuthEmail(username);
-    } catch (error) {
-        showToast(error.message, 'error');
+    if (!email || !password) {
+        showToast('Lütfen e-posta ve şifre girin!', 'error');
         return;
     }
 
@@ -587,11 +572,20 @@ authForm.addEventListener('submit', async (event) => {
             .then(() => {
                 showToast('Başarıyla giriş yapıldı!', 'success');
                 closeAuthModal();
+                authForm.reset();
+                emailInput.value = '';
+                passwordInput.value = '';
             })
             .catch((error) => {
                 showToast('Giriş Hatası: ' + error.message, 'error');
             });
     } else {
+        const username = registerUsername.value.trim();
+        if (!username) {
+            showToast('Lütfen kullanıcı adı girin!', 'error');
+            return;
+        }
+
         createUserWithEmailAndPassword(auth, email, password)
             .then((userCredential) => {
                 return updateProfile(userCredential.user, {
@@ -601,6 +595,10 @@ authForm.addEventListener('submit', async (event) => {
             .then(() => {
                 showToast(`Hoş geldin, ${username}`, 'success');
                 closeAuthModal();
+                authForm.reset();
+                registerUsername.value = '';
+                emailInput.value = '';
+                passwordInput.value = '';
             })
             .catch((error) => {
                 showToast('Kayıt Hatası: ' + error.message, 'error');
@@ -628,7 +626,7 @@ document.addEventListener('click', (event) => {
 // 4. Kullanıcı Durumunu Dinleme (Giriş yaptı mı, yapmadı mı?)
 onAuthStateChanged(auth, async (user) => {
     if (user) {
-        userStatus.textContent = 'Hoş geldin, ' + (user.displayName || user.email);
+        userNameDisplay.textContent = user.displayName || 'Kullanıcı';
         profileIcon.textContent = getUserInitials(user.displayName || user.email);
         profileMenu.style.display = 'block';
         closeAuthModal();
@@ -640,7 +638,7 @@ onAuthStateChanged(auth, async (user) => {
             calendarInstance.render();
         }
     } else {
-        userStatus.textContent = 'Giriş Yapılmadı';
+        userNameDisplay.textContent = '';
         profileIcon.textContent = '👤';
         profileMenu.style.display = 'none';
         closeProfileMenu();

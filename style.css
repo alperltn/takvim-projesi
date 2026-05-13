@@ -66,7 +66,7 @@ body {
 .profile-container {
     position: fixed;
     top: 18px;
-    right: 20px;
+    left: 20px;
     z-index: 1000;
     display: flex;
     align-items: center;
@@ -144,6 +144,14 @@ body {
     white-space: nowrap;
 }
 
+.user-name-display {
+    pointer-events: none;
+    color: var(--text-primary);
+    font-size: 0.95rem;
+    white-space: nowrap;
+    font-weight: 500;
+}
+
 .auth-modal-overlay {
     position: fixed;
     inset: 0;
@@ -205,6 +213,14 @@ body {
     background: rgba(255, 255, 255, 0.08);
     border-color: rgba(99, 102, 241, 0.9);
     box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.12);
+}
+
+#registerUsername {
+    display: none;
+}
+
+#registerUsername.visible {
+    display: block;
 }
 
 #authSubmitButton {
