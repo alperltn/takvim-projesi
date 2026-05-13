@@ -63,6 +63,196 @@ body {
     box-shadow: 0 25px 70px rgba(99, 102, 241, 0.2);
 }
 
+.profile-container {
+    position: fixed;
+    top: 18px;
+    right: 20px;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    pointer-events: none;
+}
+
+.profile-icon {
+    pointer-events: all;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.95), rgba(129, 140, 248, 0.95));
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, filter 0.3s ease;
+    box-shadow: 0 12px 30px rgba(43, 52, 92, 0.4);
+}
+
+.profile-icon:hover {
+    transform: scale(1.08);
+    filter: drop-shadow(0 0 18px rgba(129, 140, 248, 0.65));
+}
+
+.profile-menu {
+    pointer-events: all;
+    position: absolute;
+    top: calc(100% + 12px);
+    right: 0;
+    min-width: 160px;
+    background: rgba(18, 24, 42, 0.98);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 18px;
+    padding: 10px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-8px);
+    transition: all 0.2s ease;
+    z-index: 1001;
+}
+
+.profile-menu.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.profile-menu button {
+    width: 100%;
+    border: none;
+    background: transparent;
+    color: #ffffff;
+    font-size: 0.95rem;
+    text-align: left;
+    padding: 12px 14px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.profile-menu button:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.user-status {
+    pointer-events: none;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    white-space: nowrap;
+}
+
+.auth-modal-overlay {
+    position: fixed;
+    inset: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background: rgba(7, 10, 18, 0.78);
+    backdrop-filter: blur(14px);
+    z-index: 900;
+    padding: 24px;
+}
+
+.auth-modal-overlay.active {
+    display: flex;
+}
+
+.auth-modal {
+    width: min(420px, 100%);
+    background: rgba(12, 16, 30, 0.98);
+    border-radius: 28px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 40px 120px rgba(0, 0, 0, 0.45);
+    padding: 34px 32px;
+    position: relative;
+}
+
+.auth-modal h2 {
+    margin-bottom: 24px;
+    font-size: 1.9rem;
+    text-align: center;
+    color: #ffffff;
+}
+
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.auth-form label {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    letter-spacing: 0.02em;
+}
+
+.auth-form input {
+    width: 100%;
+    padding: 14px 16px;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.06);
+    color: #ffffff;
+    font-size: 1rem;
+    outline: none;
+    transition: border 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
+}
+
+.auth-form input:focus {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(99, 102, 241, 0.9);
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.12);
+}
+
+#authSubmitButton {
+    width: 100%;
+    padding: 14px 16px;
+    border-radius: 16px;
+    border: none;
+    color: #ffffff;
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.3s ease, filter 0.3s ease;
+}
+
+#authSubmitButton:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.05);
+}
+
+.auth-switch-text {
+    margin-top: 8px;
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    text-align: center;
+}
+
+.auth-switch-text span {
+    color: var(--accent-light);
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.auth-switch-text span:hover {
+    text-decoration: underline;
+}
+
+@media (max-width: 640px) {
+    .profile-container {
+        top: 14px;
+        right: 14px;
+        gap: 8px;
+    }
+
+    .auth-modal {
+        padding: 26px 22px;
+    }
+}
+
 /* ============================================
    Header Section
    ============================================ */

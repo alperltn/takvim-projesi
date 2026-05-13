@@ -485,75 +485,154 @@ document.addEventListener('DOMContentLoaded', async () => {
 // ==========================================
 
 const usernameInput = document.getElementById('username-input');
-const emailInput = document.getElementById('email-input');
 const passwordInput = document.getElementById('password-input');
-const registerBtn = document.getElementById('register-btn');
-const loginBtn = document.getElementById('login-btn');
-const logoutBtn = document.getElementById('logout-btn');
+const authForm = document.getElementById('authForm');
+const authModalOverlay = document.getElementById('authModalOverlay');
+const authModalTitle = document.getElementById('authModalTitle');
+const authSubmitButton = document.getElementById('authSubmitButton');
+const toggleAuthMode = document.getElementById('toggleAuthMode');
+const profileIcon = document.getElementById('profileIcon');
+const profileMenu = document.getElementById('profileMenu');
+const signOutBtn = document.getElementById('signOutBtn');
 const userStatus = document.getElementById('user-status');
+let authMode = 'login';
 
-// 1. Kayıt Olma İşlemi
-registerBtn.addEventListener('click', () => {
+function buildAuthEmail(username) {
+    const normalized = username.trim().toLowerCase();
+    if (!normalized) {
+        throw new Error('Geçerli bir kullanıcı adı girin.');
+    }
+    if (!/^[a-z0-9._-]{3,}$/.test(normalized)) {
+        throw new Error('Kullanıcı adı yalnızca harf, rakam, ., _ ve - içerebilir.');
+    }
+    return `${normalized}@takvim.app`;
+}
+
+function openAuthModal() {
+    authModalOverlay.classList.add('active');
+    authModalOverlay.setAttribute('aria-hidden', 'false');
+    usernameInput.focus();
+}
+
+function closeAuthModal() {
+    authModalOverlay.classList.remove('active');
+    authModalOverlay.setAttribute('aria-hidden', 'true');
+}
+
+function closeProfileMenu() {
+    profileMenu.classList.remove('active');
+}
+
+function getUserInitials(displayName) {
+    if (!displayName) {
+        return '👤';
+    }
+    const parts = displayName.trim().split(/\s+/);
+    const initials = parts.map(part => part[0].toUpperCase()).slice(0, 2).join('');
+    return initials || '👤';
+}
+
+function setAuthMode(mode) {
+    authMode = mode;
+    if (mode === 'login') {
+        authModalTitle.textContent = 'Giriş Yap';
+        authSubmitButton.textContent = 'Giriş Yap';
+        toggleAuthMode.textContent = 'Kayıt Olun';
+    } else {
+        authModalTitle.textContent = 'Yeni Hesap Oluştur';
+        authSubmitButton.textContent = 'Kayıt Ol';
+        toggleAuthMode.textContent = 'Giriş Yapın';
+    }
+}
+
+profileIcon.addEventListener('click', () => {
+    if (auth.currentUser) {
+        profileMenu.classList.toggle('active');
+    } else {
+        setAuthMode('login');
+        openAuthModal();
+    }
+});
+
+signOutBtn.addEventListener('click', async () => {
+    closeProfileMenu();
+    try {
+        await signOut(auth);
+        showToast('Çıkış yapıldı.', 'success');
+    } catch (error) {
+        showToast('Çıkış Hatası: ' + error.message, 'error');
+    }
+});
+
+authForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
     const username = usernameInput.value.trim();
-    const email = emailInput.value;
     const password = passwordInput.value;
-    
-    if(!username || !email || !password) {
-        showToast("Lütfen kullanıcı adı, e-posta ve şifre girin!", 'error');
+
+    if (!username || !password) {
+        showToast('Lütfen kullanıcı adı ve şifre girin!', 'error');
         return;
     }
 
-    createUserWithEmailAndPassword(auth, email, password)
-        .then((userCredential) => {
-            return updateProfile(userCredential.user, {
-                displayName: username
+    let email;
+    try {
+        email = buildAuthEmail(username);
+    } catch (error) {
+        showToast(error.message, 'error');
+        return;
+    }
+
+    if (authMode === 'login') {
+        signInWithEmailAndPassword(auth, email, password)
+            .then(() => {
+                showToast('Başarıyla giriş yapıldı!', 'success');
+                closeAuthModal();
+            })
+            .catch((error) => {
+                showToast('Giriş Hatası: ' + error.message, 'error');
             });
-        })
-        .then(() => {
-            showToast(`Hoş geldin, ${username}`, 'success');
-        })
-        .catch((error) => {
-            showToast("Kayıt Hatası: " + error.message, 'error');
-        });
-});
-
-// 2. Giriş Yapma İşlemi
-loginBtn.addEventListener('click', () => {
-    const email = emailInput.value;
-    const password = passwordInput.value;
-    
-    if(!email || !password) {
-        showToast("Lütfen e-posta ve şifre girin!", 'error');
-        return;
+    } else {
+        createUserWithEmailAndPassword(auth, email, password)
+            .then((userCredential) => {
+                return updateProfile(userCredential.user, {
+                    displayName: username
+                });
+            })
+            .then(() => {
+                showToast(`Hoş geldin, ${username}`, 'success');
+                closeAuthModal();
+            })
+            .catch((error) => {
+                showToast('Kayıt Hatası: ' + error.message, 'error');
+            });
     }
-
-    signInWithEmailAndPassword(auth, email, password)
-        .then((userCredential) => {
-            showToast("Başarıyla giriş yapıldı!", 'success');
-        })
-        .catch((error) => {
-            showToast("Giriş Hatası: " + error.message, 'error');
-        });
 });
 
-// 3. Çıkış Yapma İşlemi
-logoutBtn.addEventListener('click', () => {
-    signOut(auth).then(() => {
-        showToast("Çıkış yapıldı.", 'success');
-    });
+toggleAuthMode.addEventListener('click', () => {
+    setAuthMode(authMode === 'login' ? 'register' : 'login');
 });
+
+authModalOverlay.addEventListener('click', (event) => {
+    if (event.target === authModalOverlay) {
+        closeAuthModal();
+    }
+});
+
+document.addEventListener('click', (event) => {
+    if (!profileMenu.contains(event.target) && !profileIcon.contains(event.target)) {
+        closeProfileMenu();
+    }
+});
+
 
 // 4. Kullanıcı Durumunu Dinleme (Giriş yaptı mı, yapmadı mı?)
 onAuthStateChanged(auth, async (user) => {
     if (user) {
-        // Kullanıcı giriş yapmışsa arayüzü güncelle
-        userStatus.textContent = "Hoş geldin, " + (user.displayName || user.email);
-        loginBtn.style.display = 'none';
-        registerBtn.style.display = 'none';
-        usernameInput.style.display = 'none';
-        emailInput.style.display = 'none';
-        passwordInput.style.display = 'none';
-        logoutBtn.style.display = 'inline-block';
+        userStatus.textContent = 'Hoş geldin, ' + (user.displayName || user.email);
+        profileIcon.textContent = getUserInitials(user.displayName || user.email);
+        profileMenu.style.display = 'block';
+        closeAuthModal();
+        closeProfileMenu();
         
         // Load user's notes when logged in
         if (calendarInstance) {
@@ -561,14 +640,10 @@ onAuthStateChanged(auth, async (user) => {
             calendarInstance.render();
         }
     } else {
-        // Kullanıcı giriş yapmamışsa
-        userStatus.textContent = "Giriş Yapılmadı";
-        loginBtn.style.display = 'inline-block';
-        registerBtn.style.display = 'inline-block';
-        usernameInput.style.display = 'inline-block';
-        emailInput.style.display = 'inline-block';
-        passwordInput.style.display = 'inline-block';
-        logoutBtn.style.display = 'none';
+        userStatus.textContent = 'Giriş Yapılmadı';
+        profileIcon.textContent = '👤';
+        profileMenu.style.display = 'none';
+        closeProfileMenu();
         
         // Clear notes when logged out
         if (calendarInstance) {

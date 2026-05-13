@@ -7,20 +7,18 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <div class="profile-container">
+        <button id="profileIcon" class="profile-icon" aria-label="Profil">
+            <span class="profile-icon-text">👤</span>
+        </button>
+        <div id="profileMenu" class="profile-menu">
+            <button id="signOutBtn" type="button">Çıkış Yap</button>
+        </div>
+        <span id="user-status" class="user-status">Giriş Yapılmadı</span>
+    </div>
     <div class="container">
         <div class="calendar-wrapper">
             <!-- Header -->
-             <div id="auth-container" style="background: #f4f4f4; padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: right;">
-    <span id="user-status" style="margin-right: 15px; font-weight: bold; color: #333;">Giriş Yapılmadı</span>
-    
-    <input type="text" id="username-input" placeholder="Kullanıcı Adı" style="padding: 5px; margin-right: 5px;">
-    <input type="email" id="email-input" placeholder="E-posta adresin" style="padding: 5px; margin-right: 5px;">
-    <input type="password" id="password-input" placeholder="Şifre" style="padding: 5px; margin-right: 5px;">
-    
-    <button id="login-btn" style="padding: 5px 10px; cursor: pointer;">Giriş Yap</button>
-    <button id="register-btn" style="padding: 5px 10px; cursor: pointer;">Kayıt Ol</button>
-    <button id="logout-btn" style="padding: 5px 10px; cursor: pointer; display: none;">Çıkış Yap</button>
-</div>
             <div class="calendar-header">
                 <button class="btn-nav btn-prev" id="prevBtn" aria-label="Önceki ay">
                     <span>&larr;</span>
@@ -55,6 +53,20 @@
             <div class="calendar-footer">
                 <button class="btn-today" id="todayBtn">Bugün</button>
             </div>
+        </div>
+    </div>
+
+    <div class="auth-modal-overlay" id="authModalOverlay" aria-hidden="true">
+        <div class="auth-modal" id="authModal" role="dialog" aria-modal="true" aria-labelledby="authModalTitle">
+            <h2 id="authModalTitle">Giriş Yap</h2>
+            <form id="authForm" class="auth-form">
+                <label for="username-input">Kullanıcı Adı</label>
+                <input type="text" id="username-input" placeholder="Kullanıcı Adı" autocomplete="username" />
+                <label for="password-input">Şifre</label>
+                <input type="password" id="password-input" placeholder="Şifre" autocomplete="current-password" />
+                <button type="submit" id="authSubmitButton">Giriş Yap</button>
+                <p class="auth-switch-text">Hesabınız yok mu? <span id="toggleAuthMode">Kayıt Olun</span></p>
+            </form>
         </div>
     </div>
 
