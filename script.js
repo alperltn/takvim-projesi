@@ -472,6 +472,7 @@ class NoteModal {
 // ============================================
 
 document.addEventListener('DOMContentLoaded', async () => {
+    loadThemeSettings();
     calendarInstance = new Calendar();
     new NoteModal();
     
@@ -498,6 +499,11 @@ const mainSettingsView = document.getElementById('mainSettingsView');
 const themeSettingsView = document.getElementById('themeSettingsView');
 const openThemeSettingsBtn = document.getElementById('openThemeSettingsBtn');
 const backToMainBtn = document.getElementById('backToMainBtn');
+const backgroundColorPicker = document.getElementById('background-color-picker');
+const textColorPicker = document.getElementById('text-color-picker');
+const fontFamilySelect = document.getElementById('font-family-select');
+const fontSizeRange = document.getElementById('font-size-range');
+const themeModeButton = document.querySelector('#themeModeToggle .toggle-button');
 
 const authInputFields = [registerUsername, emailInput, passwordInput];
 const loginButton = document.getElementById('login-btn') || authSubmitButton;
@@ -532,6 +538,60 @@ function openAuthModal() {
 function closeAuthModal() {
     authModalOverlay.classList.remove('active');
     authModalOverlay.setAttribute('aria-hidden', 'true');
+}
+
+const themeSettingsKey = 'takvimThemeSettings';
+const defaultThemeSettings = {
+    appBg: '#1a1a1a',
+    appText: '#ffffff',
+    appFont: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+    appFontSize: '16',
+    themeMode: 'dark'
+};
+
+function applyThemeSettings(settings) {
+    document.documentElement.style.setProperty('--app-bg', settings.appBg);
+    document.documentElement.style.setProperty('--app-text', settings.appText);
+    document.documentElement.style.setProperty('--app-font', settings.appFont);
+    document.documentElement.style.setProperty('--app-font-size', `${settings.appFontSize}px`);
+    if (themeModeButton) {
+        themeModeButton.classList.toggle('active', settings.themeMode === 'dark');
+        themeModeButton.textContent = settings.themeMode === 'dark' ? 'Karanlık' : 'Aydınlık';
+    }
+}
+
+function saveThemeSettings(settings) {
+    localStorage.setItem(themeSettingsKey, JSON.stringify(settings));
+}
+
+function loadThemeSettings() {
+    const savedSettings = localStorage.getItem(themeSettingsKey);
+    const settings = savedSettings ? JSON.parse(savedSettings) : defaultThemeSettings;
+
+    applyThemeSettings(settings);
+
+    if (backgroundColorPicker) {
+        backgroundColorPicker.value = settings.appBg;
+    }
+    if (textColorPicker) {
+        textColorPicker.value = settings.appText;
+    }
+    if (fontFamilySelect) {
+        fontFamilySelect.value = settings.appFont;
+    }
+    if (fontSizeRange) {
+        fontSizeRange.value = settings.appFontSize;
+    }
+
+    return settings;
+}
+
+function updateThemeSetting(key, value) {
+    const savedSettings = localStorage.getItem(themeSettingsKey);
+    const settings = savedSettings ? JSON.parse(savedSettings) : { ...defaultThemeSettings };
+    settings[key] = value;
+    saveThemeSettings(settings);
+    applyThemeSettings(settings);
 }
 
 function showMainSettingsView() {
@@ -599,6 +659,40 @@ openThemeSettingsBtn?.addEventListener('click', () => {
 
 backToMainBtn?.addEventListener('click', () => {
     showMainSettingsView();
+});
+
+backgroundColorPicker?.addEventListener('input', (event) => {
+    updateThemeSetting('appBg', event.target.value);
+});
+
+textColorPicker?.addEventListener('input', (event) => {
+    updateThemeSetting('appText', event.target.value);
+});
+
+fontFamilySelect?.addEventListener('input', (event) => {
+    updateThemeSetting('appFont', event.target.value);
+});
+
+fontSizeRange?.addEventListener('input', (event) => {
+    updateThemeSetting('appFontSize', event.target.value);
+});
+
+themeModeButton?.addEventListener('click', () => {
+    const savedSettings = localStorage.getItem(themeSettingsKey);
+    const settings = savedSettings ? JSON.parse(savedSettings) : { ...defaultThemeSettings };
+    settings.themeMode = settings.themeMode === 'dark' ? 'light' : 'dark';
+
+    if (settings.themeMode === 'dark') {
+        settings.appBg = '#1a1a1a';
+        settings.appText = '#ffffff';
+    } else {
+        settings.appBg = '#f3f4f6';
+        settings.appText = '#111827';
+    }
+
+    updateThemeSetting('appBg', settings.appBg);
+    updateThemeSetting('appText', settings.appText);
+    updateThemeSetting('themeMode', settings.themeMode);
 });
 
 closeSidebarBtn.addEventListener('click', () => {

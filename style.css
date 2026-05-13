@@ -3,6 +3,10 @@
    ============================================ */
 
 :root {
+    --app-bg: #1a1a1a;
+    --app-text: #ffffff;
+    --app-font: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    --app-font-size: 16px;
     --primary-bg: #1a1a1a;
     --secondary-bg: #2d2d2d;
     --tertiary-bg: #3a3a3a;
@@ -30,15 +34,16 @@ html {
 }
 
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
-    color: var(--text-primary);
+    font-family: var(--app-font);
+    font-size: var(--app-font-size);
+    background: var(--app-bg);
+    color: var(--app-text);
     min-height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 20px;
-    transition: background var(--transition);
+    transition: background var(--transition), color var(--transition), font-size var(--transition);
 }
 
 /* ============================================
@@ -51,12 +56,13 @@ body {
 }
 
 .calendar-wrapper {
-    background: var(--secondary-bg);
+    background: var(--app-bg);
+    color: var(--app-text);
     border-radius: 16px;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
     overflow: hidden;
     border: 1px solid var(--border-color);
-    transition: box-shadow var(--transition);
+    transition: box-shadow var(--transition), background var(--transition), color var(--transition);
 }
 
 .calendar-wrapper:hover {
