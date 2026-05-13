@@ -81,8 +81,7 @@
         <div class="sidebar-content">
             <div id="mainSettingsView">
                 <button class="sidebar-item sidebar-nav-button" id="openThemeSettingsBtn">🎨 Tema</button>
-                <button class="sidebar-item">👁️ Görünüm</button>
-                <button class="sidebar-item">👤 Hesap</button>
+                <button class="sidebar-item" id="profileMenuBtn">👤 Profil</button>
             </div>
             <div id="themeSettingsView" class="settings-panel hidden">
                 <button id="backToMainBtn" class="sidebar-back-btn">← Geri</button>
@@ -126,6 +125,29 @@
                     <span>Karanlık / Aydınlık Mod</span>
                     <button type="button" class="toggle-button active">Karanlık</button>
                 </div>
+            </div>
+            <div id="profileSettingsView" class="settings-panel hidden">
+                <button id="backToMainFromProfileBtn" class="sidebar-back-btn">← Geri</button>
+                <div class="settings-field">
+                    <label for="profileImageInput">Profil Fotoğrafı</label>
+                    <div class="profile-image-upload">
+                        <img id="profileImagePreview" src="" alt="Profil Fotoğrafı" style="display: none;" />
+                        <input type="file" id="profileImageInput" accept="image/*" />
+                    </div>
+                </div>
+                <div class="settings-field">
+                    <label for="profileUsername">Kullanıcı Adı</label>
+                    <input type="text" id="profileUsername" />
+                </div>
+                <div class="settings-field">
+                    <label for="profileEmail">Email</label>
+                    <input type="email" id="profileEmail" readonly />
+                </div>
+                <div class="settings-field">
+                    <label for="profilePassword">Yeni Şifre</label>
+                    <input type="password" id="profilePassword" placeholder="Değiştirmek istemiyorsanız boş bırakın" />
+                </div>
+                <button id="updateProfileBtn" class="update-profile-btn">Güncelle</button>
             </div>
         </div>
         <div class="sidebar-footer">

@@ -497,8 +497,11 @@ const profileIcon = document.getElementById('profileIcon');
 const userNameDisplay = document.getElementById('userNameDisplay');
 const mainSettingsView = document.getElementById('mainSettingsView');
 const themeSettingsView = document.getElementById('themeSettingsView');
+const profileSettingsView = document.getElementById('profileSettingsView');
 const openThemeSettingsBtn = document.getElementById('openThemeSettingsBtn');
 const backToMainBtn = document.getElementById('backToMainBtn');
+const backToMainFromProfileBtn = document.getElementById('backToMainFromProfileBtn');
+const profileMenuBtn = document.getElementById('profileMenuBtn');
 const bgColorInput = document.getElementById('bgColor');
 const uiTextColorInput = document.getElementById('uiTextColor');
 const noteTextColorInput = document.getElementById('noteTextColor');
@@ -619,6 +622,12 @@ function showThemeSettingsView() {
 function showMainSettingsView() {
     mainSettingsView?.classList.remove('hidden');
     themeSettingsView?.classList.add('hidden');
+    profileSettingsView?.classList.add('hidden');
+}
+
+function showProfileSettingsView() {
+    mainSettingsView?.classList.add('hidden');
+    profileSettingsView?.classList.remove('hidden');
 }
 
 function openSidebar() {
@@ -685,6 +694,35 @@ if (openThemeSettingsBtn) {
 if (backToMainBtn) {
     backToMainBtn.addEventListener('click', () => {
         showMainSettingsView();
+    });
+}
+
+if (profileMenuBtn) {
+    profileMenuBtn.addEventListener('click', () => {
+        showProfileSettingsView();
+    });
+}
+
+if (backToMainFromProfileBtn) {
+    backToMainFromProfileBtn.addEventListener('click', () => {
+        showMainSettingsView();
+    });
+}
+
+const profileImageInput = document.getElementById('profileImageInput');
+const profileImagePreview = document.getElementById('profileImagePreview');
+
+if (profileImageInput && profileImagePreview) {
+    profileImageInput.addEventListener('change', (event) => {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                profileImagePreview.src = e.target.result;
+                profileImagePreview.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        }
     });
 }
 
@@ -829,6 +867,11 @@ onAuthStateChanged(auth, async (user) => {
                 iconText.textContent = getUserInitials(user.displayName || user.email);
             }
         }
+        // Fill profile settings
+        const profileUsername = document.getElementById('profileUsername');
+        const profileEmail = document.getElementById('profileEmail');
+        if (profileUsername) profileUsername.value = user.displayName || '';
+        if (profileEmail) profileEmail.value = user.email || '';
         closeAuthModal();
         closeSidebar();
         
