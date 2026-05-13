@@ -87,16 +87,20 @@
             <div id="themeSettingsView" class="settings-panel hidden">
                 <button id="backToMainBtn" class="sidebar-back-btn">← Geri</button>
                 <div class="settings-field">
-                    <label for="background-color-picker">Arkaplan Rengi</label>
-                    <input type="color" id="background-color-picker" value="#1a1a1a" />
+                    <label for="bgColor">Arkaplan Rengi</label>
+                    <input type="color" id="bgColor" value="#1a1a1a" />
                 </div>
                 <div class="settings-field">
-                    <label for="text-color-picker">Yazı Rengi</label>
-                    <input type="color" id="text-color-picker" value="#ffffff" />
+                    <label for="uiTextColor">Arayüz Yazı Rengi</label>
+                    <input type="color" id="uiTextColor" value="#ffffff" />
                 </div>
                 <div class="settings-field">
-                    <label for="font-family-select">Font Tipi</label>
-                    <select id="font-family-select">
+                    <label for="noteTextColor">Not Yazı Rengi</label>
+                    <input type="color" id="noteTextColor" value="#ffffff" />
+                </div>
+                <div class="settings-field">
+                    <label for="uiFont">Arayüz Fontu</label>
+                    <select id="uiFont">
                         <option value="'Segoe UI', Tahoma, Geneva, Verdana, sans-serif">Segoe UI</option>
                         <option value="Arial, sans-serif">Arial</option>
                         <option value="'Roboto', sans-serif">Roboto</option>
@@ -105,8 +109,18 @@
                     </select>
                 </div>
                 <div class="settings-field">
-                    <label for="font-size-range">Yazı Boyutu</label>
-                    <input type="range" id="font-size-range" min="14" max="20" value="16" />
+                    <label for="noteFont">Not Fontu</label>
+                    <select id="noteFont">
+                        <option value="'Segoe UI', Tahoma, Geneva, Verdana, sans-serif">Segoe UI</option>
+                        <option value="Arial, sans-serif">Arial</option>
+                        <option value="'Roboto', sans-serif">Roboto</option>
+                        <option value="'Inter', sans-serif">Inter</option>
+                        <option value="Verdana, Geneva, sans-serif">Verdana</option>
+                    </select>
+                </div>
+                <div class="settings-field">
+                    <label for="fontSize">Yazı Boyutu</label>
+                    <input type="range" id="fontSize" min="14" max="20" value="16" />
                 </div>
                 <div class="settings-field toggle-switch" id="themeModeToggle">
                     <span>Karanlık / Aydınlık Mod</span>

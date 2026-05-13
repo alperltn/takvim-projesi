@@ -3,10 +3,16 @@
    ============================================ */
 
 :root {
-    --app-bg: #1a1a1a;
-    --app-text: #ffffff;
-    --app-font: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    --app-font-size: 16px;
+    --bg-color: #1a1a1a;
+    --ui-text: #ffffff;
+    --note-text: #ffffff;
+    --ui-font: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    --note-font: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    --global-font-size: 16px;
+    --app-bg: var(--bg-color);
+    --app-text: var(--ui-text);
+    --app-font: var(--ui-font);
+    --app-font-size: var(--global-font-size);
     --primary-bg: #1a1a1a;
     --secondary-bg: #2d2d2d;
     --tertiary-bg: #3a3a3a;
@@ -30,14 +36,14 @@
 }
 
 html {
-    font-size: 16px;
+    font-size: var(--global-font-size);
 }
 
 body {
-    font-family: var(--app-font);
-    font-size: var(--app-font-size);
-    background: var(--app-bg);
-    color: var(--app-text);
+    font-family: var(--ui-font);
+    font-size: var(--global-font-size);
+    background: var(--bg-color);
+    color: var(--ui-text);
     min-height: 100vh;
     display: flex;
     align-items: center;
@@ -56,8 +62,10 @@ body {
 }
 
 .calendar-wrapper {
-    background: var(--app-bg);
-    color: var(--app-text);
+    background: var(--bg-color);
+    color: var(--ui-text);
+    font-family: var(--ui-font);
+    font-size: var(--global-font-size);
     border-radius: 16px;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
     overflow: hidden;
@@ -1010,8 +1018,9 @@ body.light-mode .day:hover {
 
 .note-preview {
     display: -webkit-box;
-    font-size: 0.9rem;
-    color: var(--text-primary);
+    font-family: var(--note-font);
+    font-size: calc(var(--global-font-size) * 0.9);
+    color: var(--note-text);
     margin-top: 4px;
     white-space: pre-wrap;
     overflow: hidden;
@@ -1135,9 +1144,9 @@ body.light-mode .day:hover {
     background: var(--tertiary-bg);
     border: 2px solid var(--border-color);
     border-radius: 8px;
-    color: var(--text-primary);
-    font-family: inherit;
-    font-size: 1rem;
+    color: var(--note-text);
+    font-family: var(--note-font);
+    font-size: calc(var(--global-font-size) * 0.95);
     resize: vertical;
     transition: all var(--transition);
     outline: none;

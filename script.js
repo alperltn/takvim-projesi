@@ -499,10 +499,12 @@ const mainSettingsView = document.getElementById('mainSettingsView');
 const themeSettingsView = document.getElementById('themeSettingsView');
 const openThemeSettingsBtn = document.getElementById('openThemeSettingsBtn');
 const backToMainBtn = document.getElementById('backToMainBtn');
-const backgroundColorPicker = document.getElementById('background-color-picker');
-const textColorPicker = document.getElementById('text-color-picker');
-const fontFamilySelect = document.getElementById('font-family-select');
-const fontSizeRange = document.getElementById('font-size-range');
+const bgColorInput = document.getElementById('bgColor');
+const uiTextColorInput = document.getElementById('uiTextColor');
+const noteTextColorInput = document.getElementById('noteTextColor');
+const uiFontSelect = document.getElementById('uiFont');
+const noteFontSelect = document.getElementById('noteFont');
+const fontSizeInput = document.getElementById('fontSize');
 const themeModeButton = document.querySelector('#themeModeToggle .toggle-button');
 
 const authInputFields = [registerUsername, emailInput, passwordInput];
@@ -528,6 +530,75 @@ const sidebarOverlay = document.getElementById('sidebarOverlay');
 const closeSidebarBtn = document.getElementById('closeSidebarBtn');
 const logoutBtn = document.getElementById('logoutBtn');
 let authMode = 'login';
+const themeStorageKeys = {
+    bgColor: 'savedBgColor',
+    uiText: 'savedUiColor',
+    noteText: 'savedNoteColor',
+    uiFont: 'savedUiFont',
+    noteFont: 'savedNoteFont',
+    fontSize: 'savedFontSize',
+    themeMode: 'savedThemeMode'
+};
+const defaultThemeSettings = {
+    bgColor: '#1a1a1a',
+    uiText: '#ffffff',
+    noteText: '#ffffff',
+    uiFont: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+    noteFont: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+    fontSize: '16',
+    themeMode: 'dark'
+};
+
+function getSavedThemeValue(key, fallback) {
+    const saved = localStorage.getItem(key);
+    return saved !== null ? saved : fallback;
+}
+
+function applyThemeSettings(settings) {
+    document.documentElement.style.setProperty('--bg-color', settings.bgColor);
+    document.documentElement.style.setProperty('--ui-text', settings.uiText);
+    document.documentElement.style.setProperty('--note-text', settings.noteText);
+    document.documentElement.style.setProperty('--ui-font', settings.uiFont);
+    document.documentElement.style.setProperty('--note-font', settings.noteFont);
+    document.documentElement.style.setProperty('--global-font-size', `${settings.fontSize}px`);
+
+    if (themeModeButton) {
+        themeModeButton.classList.toggle('active', settings.themeMode === 'dark');
+        themeModeButton.textContent = settings.themeMode === 'dark' ? 'Karanlık' : 'Aydınlık';
+    }
+}
+
+function saveThemeValue(key, value) {
+    localStorage.setItem(key, value);
+}
+
+function loadThemeSettings() {
+    const settings = {
+        bgColor: getSavedThemeValue(themeStorageKeys.bgColor, defaultThemeSettings.bgColor),
+        uiText: getSavedThemeValue(themeStorageKeys.uiText, defaultThemeSettings.uiText),
+        noteText: getSavedThemeValue(themeStorageKeys.noteText, defaultThemeSettings.noteText),
+        uiFont: getSavedThemeValue(themeStorageKeys.uiFont, defaultThemeSettings.uiFont),
+        noteFont: getSavedThemeValue(themeStorageKeys.noteFont, defaultThemeSettings.noteFont),
+        fontSize: getSavedThemeValue(themeStorageKeys.fontSize, defaultThemeSettings.fontSize),
+        themeMode: getSavedThemeValue(themeStorageKeys.themeMode, defaultThemeSettings.themeMode)
+    };
+
+    applyThemeSettings(settings);
+
+    if (bgColorInput) bgColorInput.value = settings.bgColor;
+    if (uiTextColorInput) uiTextColorInput.value = settings.uiText;
+    if (noteTextColorInput) noteTextColorInput.value = settings.noteText;
+    if (uiFontSelect) uiFontSelect.value = settings.uiFont;
+    if (noteFontSelect) noteFontSelect.value = settings.noteFont;
+    if (fontSizeInput) fontSizeInput.value = settings.fontSize;
+
+    return settings;
+}
+
+function updateThemeSetting(storageKey, cssVariable, value) {
+    document.documentElement.style.setProperty(cssVariable, value);
+    saveThemeValue(storageKey, value);
+}
 
 function openAuthModal() {
     authModalOverlay.classList.add('active');
@@ -538,65 +609,6 @@ function openAuthModal() {
 function closeAuthModal() {
     authModalOverlay.classList.remove('active');
     authModalOverlay.setAttribute('aria-hidden', 'true');
-}
-
-const themeSettingsKey = 'takvimThemeSettings';
-const defaultThemeSettings = {
-    appBg: '#1a1a1a',
-    appText: '#ffffff',
-    appFont: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
-    appFontSize: '16',
-    themeMode: 'dark'
-};
-
-function applyThemeSettings(settings) {
-    document.documentElement.style.setProperty('--app-bg', settings.appBg);
-    document.documentElement.style.setProperty('--app-text', settings.appText);
-    document.documentElement.style.setProperty('--app-font', settings.appFont);
-    document.documentElement.style.setProperty('--app-font-size', `${settings.appFontSize}px`);
-    if (themeModeButton) {
-        themeModeButton.classList.toggle('active', settings.themeMode === 'dark');
-        themeModeButton.textContent = settings.themeMode === 'dark' ? 'Karanlık' : 'Aydınlık';
-    }
-}
-
-function saveThemeSettings(settings) {
-    localStorage.setItem(themeSettingsKey, JSON.stringify(settings));
-}
-
-function loadThemeSettings() {
-    const savedSettings = localStorage.getItem(themeSettingsKey);
-    const settings = savedSettings ? JSON.parse(savedSettings) : defaultThemeSettings;
-
-    applyThemeSettings(settings);
-
-    if (backgroundColorPicker) {
-        backgroundColorPicker.value = settings.appBg;
-    }
-    if (textColorPicker) {
-        textColorPicker.value = settings.appText;
-    }
-    if (fontFamilySelect) {
-        fontFamilySelect.value = settings.appFont;
-    }
-    if (fontSizeRange) {
-        fontSizeRange.value = settings.appFontSize;
-    }
-
-    return settings;
-}
-
-function updateThemeSetting(key, value) {
-    const savedSettings = localStorage.getItem(themeSettingsKey);
-    const settings = savedSettings ? JSON.parse(savedSettings) : { ...defaultThemeSettings };
-    settings[key] = value;
-    saveThemeSettings(settings);
-    applyThemeSettings(settings);
-}
-
-function showMainSettingsView() {
-    mainSettingsView?.classList.remove('hidden');
-    themeSettingsView?.classList.add('hidden');
 }
 
 function showThemeSettingsView() {
@@ -661,38 +673,52 @@ backToMainBtn?.addEventListener('click', () => {
     showMainSettingsView();
 });
 
-backgroundColorPicker?.addEventListener('input', (event) => {
-    updateThemeSetting('appBg', event.target.value);
+bgColorInput?.addEventListener('input', (event) => {
+    updateThemeSetting(themeStorageKeys.bgColor, '--bg-color', event.target.value);
 });
 
-textColorPicker?.addEventListener('input', (event) => {
-    updateThemeSetting('appText', event.target.value);
+uiTextColorInput?.addEventListener('input', (event) => {
+    updateThemeSetting(themeStorageKeys.uiText, '--ui-text', event.target.value);
 });
 
-fontFamilySelect?.addEventListener('input', (event) => {
-    updateThemeSetting('appFont', event.target.value);
+noteTextColorInput?.addEventListener('input', (event) => {
+    updateThemeSetting(themeStorageKeys.noteText, '--note-text', event.target.value);
 });
 
-fontSizeRange?.addEventListener('input', (event) => {
-    updateThemeSetting('appFontSize', event.target.value);
+uiFontSelect?.addEventListener('input', (event) => {
+    updateThemeSetting(themeStorageKeys.uiFont, '--ui-font', event.target.value);
+});
+
+noteFontSelect?.addEventListener('input', (event) => {
+    updateThemeSetting(themeStorageKeys.noteFont, '--note-font', event.target.value);
+});
+
+fontSizeInput?.addEventListener('input', (event) => {
+    updateThemeSetting(themeStorageKeys.fontSize, '--global-font-size', `${event.target.value}px`);
 });
 
 themeModeButton?.addEventListener('click', () => {
-    const savedSettings = localStorage.getItem(themeSettingsKey);
-    const settings = savedSettings ? JSON.parse(savedSettings) : { ...defaultThemeSettings };
-    settings.themeMode = settings.themeMode === 'dark' ? 'light' : 'dark';
+    const currentMode = getSavedThemeValue(themeStorageKeys.themeMode, defaultThemeSettings.themeMode);
+    const nextMode = currentMode === 'dark' ? 'light' : 'dark';
+    saveThemeValue(themeStorageKeys.themeMode, nextMode);
 
-    if (settings.themeMode === 'dark') {
-        settings.appBg = '#1a1a1a';
-        settings.appText = '#ffffff';
-    } else {
-        settings.appBg = '#f3f4f6';
-        settings.appText = '#111827';
+    const uiColor = nextMode === 'dark' ? '#ffffff' : '#111827';
+    const bgColor = nextMode === 'dark' ? '#1a1a1a' : '#f3f4f6';
+
+    updateThemeSetting(themeStorageKeys.uiText, '--ui-text', uiColor);
+    updateThemeSetting(themeStorageKeys.bgColor, '--bg-color', bgColor);
+
+    if (bgColorInput) {
+        bgColorInput.value = bgColor;
+    }
+    if (uiTextColorInput) {
+        uiTextColorInput.value = uiColor;
     }
 
-    updateThemeSetting('appBg', settings.appBg);
-    updateThemeSetting('appText', settings.appText);
-    updateThemeSetting('themeMode', settings.themeMode);
+    if (themeModeButton) {
+        themeModeButton.classList.toggle('active', nextMode === 'dark');
+        themeModeButton.textContent = nextMode === 'dark' ? 'Karanlık' : 'Aydınlık';
+    }
 });
 
 closeSidebarBtn.addEventListener('click', () => {
