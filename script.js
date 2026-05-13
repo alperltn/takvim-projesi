@@ -74,9 +74,9 @@ class Calendar {
         this.todayBtn = document.getElementById('todayBtn');
 
         // Event Listeners
-        this.prevBtn.addEventListener('click', () => this.previousMonth());
-        this.nextBtn.addEventListener('click', () => this.nextMonth());
-        this.todayBtn.addEventListener('click', () => this.goToToday());
+        this.prevBtn?.addEventListener('click', () => this.previousMonth());
+        this.nextBtn?.addEventListener('click', () => this.nextMonth());
+        this.todayBtn?.addEventListener('click', () => this.goToToday());
 
         // Initial Render
         this.render();
@@ -386,18 +386,18 @@ class NoteModal {
      */
     attachEventListeners() {
         // Close button click
-        this.closeModalBtn.addEventListener('click', () => this.closeModal());
+        this.closeModalBtn?.addEventListener('click', () => this.closeModal());
         
         // Cancel button click
-        this.cancelBtn.addEventListener('click', () => this.closeModal());
+        this.cancelBtn?.addEventListener('click', () => this.closeModal());
         
         // Save button click
-        this.saveBtn.addEventListener('click', () => this.saveNote());
+        this.saveBtn?.addEventListener('click', () => this.saveNote());
         
 
         
         // Character count update
-        this.textarea.addEventListener('input', () => {
+        this.textarea?.addEventListener('input', () => {
             this.charCount.textContent = this.textarea.value.length;
         });
         
@@ -743,7 +743,7 @@ if (sidebarOverlay) {
     });
 }
 
-logoutBtn.addEventListener('click', async () => {
+logoutBtn?.addEventListener('click', async () => {
     closeSidebar();
     try {
         await signOut(auth);
@@ -753,7 +753,7 @@ logoutBtn.addEventListener('click', async () => {
     }
 });
 
-authForm.addEventListener('submit', async (event) => {
+authForm?.addEventListener('submit', async (event) => {
     event.preventDefault();
     const email = emailInput.value.trim();
     const password = passwordInput.value;
@@ -802,11 +802,11 @@ authForm.addEventListener('submit', async (event) => {
     }
 });
 
-toggleAuthMode.addEventListener('click', () => {
+toggleAuthMode?.addEventListener('click', () => {
     setAuthMode(authMode === 'login' ? 'register' : 'login');
 });
 
-authModalOverlay.addEventListener('click', (event) => {
+authModalOverlay?.addEventListener('click', (event) => {
     if (event.target === authModalOverlay) {
         closeAuthModal();
     }
@@ -815,8 +815,15 @@ authModalOverlay.addEventListener('click', (event) => {
 // 4. Kullanıcı Durumunu Dinleme (Giriş yaptı mı, yapmadı mı?)
 onAuthStateChanged(auth, async (user) => {
     if (user) {
-        userNameDisplay.textContent = user.displayName || 'Kullanıcı';
-        profileIcon.querySelector('.profile-icon-text').textContent = getUserInitials(user.displayName || user.email);
+        if (userNameDisplay) {
+            userNameDisplay.textContent = user.displayName || 'Kullanıcı';
+        }
+        if (profileIcon) {
+            const iconText = profileIcon.querySelector('.profile-icon-text');
+            if (iconText) {
+                iconText.textContent = getUserInitials(user.displayName || user.email);
+            }
+        }
         closeAuthModal();
         closeSidebar();
         
