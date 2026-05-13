@@ -595,6 +595,16 @@ function loadThemeSettings() {
     if (noteFontSelect) noteFontSelect.value = settings.noteFont;
     if (fontSizeInput) fontSizeInput.value = settings.fontSize;
 
+    // Load saved profile picture
+    const savedProfilePic = localStorage.getItem('savedProfilePic');
+    if (savedProfilePic) {
+        if (profileImagePreview) {
+            profileImagePreview.src = savedProfilePic;
+            profileImagePreview.style.display = 'block';
+        }
+        updateProfileIcon(savedProfilePic);
+    }
+
     return settings;
 }
 
@@ -643,13 +653,20 @@ function closeSidebar() {
     sidebarOverlay.classList.remove('active');
 }
 
-function getUserInitials(displayName) {
-    if (!displayName) {
-        return '👤';
+function updateProfileIcon(imageSrc) {
+    if (profileIcon) {
+        // Clear existing content
+        profileIcon.innerHTML = '';
+        // Add image
+        const img = document.createElement('img');
+        img.src = imageSrc;
+        img.style.width = '100%';
+        img.style.height = '100%';
+        img.style.objectFit = 'cover';
+        img.style.borderRadius = '50%';
+        img.alt = 'Profil Fotoğrafı';
+        profileIcon.appendChild(img);
     }
-    const parts = displayName.trim().split(/\s+/);
-    const initials = parts.map(part => part[0].toUpperCase()).slice(0, 2).join('');
-    return initials || '👤';
 }
 
 function setAuthMode(mode) {
@@ -711,6 +728,7 @@ if (backToMainFromProfileBtn) {
 
 const profileImageInput = document.getElementById('profileImageInput');
 const profileImagePreview = document.getElementById('profileImagePreview');
+const updateProfileBtn = document.getElementById('updateProfileBtn');
 
 if (profileImageInput && profileImagePreview) {
     profileImageInput.addEventListener('change', (event) => {
@@ -722,6 +740,19 @@ if (profileImageInput && profileImagePreview) {
                 profileImagePreview.style.display = 'block';
             };
             reader.readAsDataURL(file);
+        }
+    });
+}
+
+if (updateProfileBtn) {
+    updateProfileBtn.addEventListener('click', () => {
+        // Save profile picture to localStorage
+        if (profileImagePreview.src && profileImagePreview.style.display !== 'none') {
+            localStorage.setItem('savedProfilePic', profileImagePreview.src);
+            updateProfileIcon(profileImagePreview.src);
+            showToast('Profil fotoğrafı güncellendi!', 'success');
+        } else {
+            showToast('Lütfen bir fotoğraf seçin.', 'error');
         }
     });
 }
@@ -862,9 +893,14 @@ onAuthStateChanged(auth, async (user) => {
             userNameDisplay.textContent = user.displayName || 'Kullanıcı';
         }
         if (profileIcon) {
-            const iconText = profileIcon.querySelector('.profile-icon-text');
-            if (iconText) {
-                iconText.textContent = getUserInitials(user.displayName || user.email);
+            const savedProfilePic = localStorage.getItem('savedProfilePic');
+            if (savedProfilePic) {
+                updateProfileIcon(savedProfilePic);
+            } else {
+                const iconText = profileIcon.querySelector('.profile-icon-text');
+                if (iconText) {
+                    iconText.textContent = getUserInitials(user.displayName || user.email);
+                }
             }
         }
         // Fill profile settings
@@ -882,7 +918,9 @@ onAuthStateChanged(auth, async (user) => {
         }
     } else {
         userNameDisplay.textContent = '';
-        profileIcon.querySelector('.profile-icon-text').textContent = '👤';
+        if (profileIcon) {
+            profileIcon.innerHTML = '<span class="profile-icon-text">👤</span>';
+        }
         closeSidebar();
         setAuthMode('login');
         openAuthModal();
