@@ -626,6 +626,12 @@ function loadThemeSettings() {
             profileImagePreview.style.display = 'block';
         }
         updateProfileIcon(savedProfilePic);
+    } else {
+        // Reset profile preview if no saved image
+        if (profileImagePreview) {
+            profileImagePreview.src = '';
+            profileImagePreview.style.display = 'none';
+        }
     }
 
     return settings;
@@ -1104,10 +1110,12 @@ onAuthStateChanged(auth, async (user) => {
             if (savedProfilePic) {
                 updateProfileIcon(savedProfilePic);
             } else {
-                const iconText = profileIcon.querySelector('.profile-icon-text');
-                if (iconText) {
-                    iconText.textContent = getUserInitials(user.displayName || user.email);
-                }
+                // Reset profile icon to initials if no saved image
+                profileIcon.innerHTML = '';
+                const iconSpan = document.createElement('span');
+                iconSpan.className = 'profile-icon-text';
+                iconSpan.textContent = getUserInitials(user.displayName || user.email);
+                profileIcon.appendChild(iconSpan);
             }
         }
         // Fill profile settings
@@ -1118,6 +1126,9 @@ onAuthStateChanged(auth, async (user) => {
         closeAuthModal();
         closeSidebar();
         
+        // Load user's theme settings when logged in
+        loadThemeSettings();
+        
         // Load user's notes when logged in
         if (calendarInstance) {
             await calendarInstance.loadNotesFromFirestore();
@@ -1127,6 +1138,23 @@ onAuthStateChanged(auth, async (user) => {
         userNameDisplay.textContent = '';
         if (profileIcon) {
             profileIcon.innerHTML = '<span class="profile-icon-text">👤</span>';
+        }
+        // Reset theme settings to defaults when logged out
+        applyThemeSettings(defaultThemeSettings);
+        if (bgColorInput) bgColorInput.value = defaultThemeSettings.bgColor;
+        if (uiTextColorInput) uiTextColorInput.value = defaultThemeSettings.uiText;
+        if (noteTextColorInput) noteTextColorInput.value = defaultThemeSettings.noteText;
+        if (uiFontSelect) uiFontSelect.value = defaultThemeSettings.uiFont;
+        if (noteFontSelect) noteFontSelect.value = defaultThemeSettings.noteFont;
+        if (fontSizeInput) fontSizeInput.value = defaultThemeSettings.fontSize;
+        if (themeModeButton) {
+            themeModeButton.classList.toggle('active', defaultThemeSettings.themeMode === 'dark');
+            themeModeButton.textContent = defaultThemeSettings.themeMode === 'dark' ? 'Karanlık' : 'Aydınlık';
+        }
+        // Reset profile image
+        if (profileImagePreview) {
+            profileImagePreview.src = '';
+            profileImagePreview.style.display = 'none';
         }
         closeSidebar();
         setAuthMode('login');
