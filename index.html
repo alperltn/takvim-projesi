@@ -11,23 +11,20 @@
         <div class="calendar-wrapper">
             <!-- Header -->
             <div class="calendar-header">
-                <div class="header-left">
-                    <button id="profileIcon" class="profile-icon" aria-label="Profil">
-                        <span class="profile-icon-text">👤</span>
-                    </button>
-                    <span id="userNameDisplay" class="user-name-display"></span>
-                    <div id="profileMenu" class="profile-menu">
-                        <button id="signOutBtn" type="button">Çıkış Yap</button>
-                    </div>
-                </div>
+                <button id="settingsBtn" class="settings-btn" aria-label="Ayarlar">
+                    <span>⚙️</span>
+                </button>
                 
                 <div class="month-year">
                     <h1 id="monthYear"></h1>
                 </div>
                 
-                <button id="settingsBtn" class="settings-btn" aria-label="Ayarlar">
-                    <span>⚙️</span>
-                </button>
+                <div class="header-right">
+                    <span id="userNameDisplay" class="user-name-display"></span>
+                    <button id="profileIcon" class="profile-icon" aria-label="Profil">
+                        <span class="profile-icon-text">👤</span>
+                    </button>
+                </div>
             </div>
 
             <!-- Weekday Headers -->
@@ -74,6 +71,37 @@
             </form>
         </div>
     </div>
+
+    <!-- Sidebar -->
+    <aside id="sidebar">
+        <div class="sidebar-header">
+            <h2>Ayarlar</h2>
+            <button id="closeSidebarBtn" class="close-sidebar-btn" aria-label="Kapat">&times;</button>
+        </div>
+        <div class="sidebar-content">
+            <div class="sidebar-category">
+                <h3>🎨 Tema</h3>
+                <button class="sidebar-item">Karanlık Mod</button>
+                <button class="sidebar-item">Aydınlık Mod</button>
+            </div>
+            <div class="sidebar-category">
+                <h3>👁️ Görünüm</h3>
+                <button class="sidebar-item">Takvim Görünümü</button>
+                <button class="sidebar-item">Liste Görünümü</button>
+            </div>
+            <div class="sidebar-category">
+                <h3>👤 Hesap</h3>
+                <button class="sidebar-item">Profil Düzenle</button>
+                <button class="sidebar-item">Hesap Ayarları</button>
+            </div>
+        </div>
+        <div class="sidebar-footer">
+            <button id="logoutBtn" class="logout-btn">Çıkış Yap</button>
+        </div>
+    </aside>
+
+    <!-- Sidebar Overlay -->
+    <div id="sidebarOverlay"></div>
 
     <!-- Modal for Day Notes -->
     <div class="modal-overlay" id="modalOverlay">

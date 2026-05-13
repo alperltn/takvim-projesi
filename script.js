@@ -493,9 +493,12 @@ const authModalTitle = document.getElementById('authModalTitle');
 const authSubmitButton = document.getElementById('authSubmitButton');
 const toggleAuthMode = document.getElementById('toggleAuthMode');
 const profileIcon = document.getElementById('profileIcon');
-const profileMenu = document.getElementById('profileMenu');
-const signOutBtn = document.getElementById('signOutBtn');
 const userNameDisplay = document.getElementById('userNameDisplay');
+const settingsBtn = document.getElementById('settingsBtn');
+const sidebar = document.getElementById('sidebar');
+const sidebarOverlay = document.getElementById('sidebarOverlay');
+const closeSidebarBtn = document.getElementById('closeSidebarBtn');
+const logoutBtn = document.getElementById('logoutBtn');
 let authMode = 'login';
 
 function openAuthModal() {
@@ -509,8 +512,14 @@ function closeAuthModal() {
     authModalOverlay.setAttribute('aria-hidden', 'true');
 }
 
-function closeProfileMenu() {
-    profileMenu.classList.remove('active');
+function openSidebar() {
+    sidebar.classList.add('active');
+    sidebarOverlay.classList.add('active');
+}
+
+function closeSidebar() {
+    sidebar.classList.remove('active');
+    sidebarOverlay.classList.remove('active');
 }
 
 function getUserInitials(displayName) {
@@ -540,15 +549,27 @@ function setAuthMode(mode) {
 
 profileIcon.addEventListener('click', () => {
     if (auth.currentUser) {
-        profileMenu.classList.toggle('active');
+        openSidebar();
     } else {
         setAuthMode('login');
         openAuthModal();
     }
 });
 
-signOutBtn.addEventListener('click', async () => {
-    closeProfileMenu();
+settingsBtn.addEventListener('click', () => {
+    openSidebar();
+});
+
+closeSidebarBtn.addEventListener('click', () => {
+    closeSidebar();
+});
+
+sidebarOverlay.addEventListener('click', () => {
+    closeSidebar();
+});
+
+logoutBtn.addEventListener('click', async () => {
+    closeSidebar();
     try {
         await signOut(auth);
         showToast('Çıkış yapıldı.', 'success');
@@ -616,21 +637,13 @@ authModalOverlay.addEventListener('click', (event) => {
     }
 });
 
-document.addEventListener('click', (event) => {
-    if (!profileMenu.contains(event.target) && !profileIcon.contains(event.target)) {
-        closeProfileMenu();
-    }
-});
-
-
 // 4. Kullanıcı Durumunu Dinleme (Giriş yaptı mı, yapmadı mı?)
 onAuthStateChanged(auth, async (user) => {
     if (user) {
         userNameDisplay.textContent = user.displayName || 'Kullanıcı';
-        profileIcon.textContent = getUserInitials(user.displayName || user.email);
-        profileMenu.style.display = 'block';
+        profileIcon.querySelector('.profile-icon-text').textContent = getUserInitials(user.displayName || user.email);
         closeAuthModal();
-        closeProfileMenu();
+        closeSidebar();
         
         // Load user's notes when logged in
         if (calendarInstance) {
@@ -639,9 +652,10 @@ onAuthStateChanged(auth, async (user) => {
         }
     } else {
         userNameDisplay.textContent = '';
-        profileIcon.textContent = '👤';
-        profileMenu.style.display = 'none';
-        closeProfileMenu();
+        profileIcon.querySelector('.profile-icon-text').textContent = '👤';
+        closeSidebar();
+        setAuthMode('login');
+        openAuthModal();
         
         // Clear notes when logged out
         if (calendarInstance) {
