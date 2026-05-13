@@ -568,8 +568,14 @@ const defaultThemeSettings = {
     themeMode: 'dark'
 };
 
+function getUserScopedKey(baseKey) {
+    const user = auth.currentUser;
+    return user ? `${user.uid}_${baseKey}` : baseKey;
+}
+
 function getSavedThemeValue(key, fallback) {
-    const saved = localStorage.getItem(key);
+    const scopedKey = getUserScopedKey(key);
+    const saved = localStorage.getItem(scopedKey);
     return saved !== null ? saved : fallback;
 }
 
@@ -588,7 +594,8 @@ function applyThemeSettings(settings) {
 }
 
 function saveThemeValue(key, value) {
-    localStorage.setItem(key, value);
+    const scopedKey = getUserScopedKey(key);
+    localStorage.setItem(scopedKey, value);
 }
 
 function loadThemeSettings() {
@@ -612,7 +619,7 @@ function loadThemeSettings() {
     if (fontSizeInput) fontSizeInput.value = settings.fontSize;
 
     // Load saved profile picture
-    const savedProfilePic = localStorage.getItem('savedProfilePic');
+    const savedProfilePic = localStorage.getItem(getUserScopedKey('savedProfilePic'));
     if (savedProfilePic) {
         if (profileImagePreview) {
             profileImagePreview.src = savedProfilePic;
@@ -693,8 +700,8 @@ function closeProfileDropdown() {
 }
 
 function loadProfileDisplay() {
-    const savedUsername = localStorage.getItem('profileUsername');
-    const savedEmail = localStorage.getItem('profileEmail');
+    const savedUsername = localStorage.getItem(getUserScopedKey('profileUsername'));
+    const savedEmail = localStorage.getItem(getUserScopedKey('profileEmail'));
     
     if (displayUsername) {
         displayUsername.textContent = savedUsername || (auth.currentUser?.displayName || 'Kullanıcı');
@@ -834,7 +841,7 @@ if (saveUsernameBtn) {
     saveUsernameBtn.addEventListener('click', () => {
         const newUsername = editUsernameInput.value.trim();
         if (newUsername) {
-            localStorage.setItem('profileUsername', newUsername);
+            localStorage.setItem(getUserScopedKey('profileUsername'), newUsername);
             displayUsername.textContent = newUsername;
             if (userNameDisplay) {
                 userNameDisplay.textContent = newUsername;
@@ -851,7 +858,7 @@ if (saveEmailBtn) {
     saveEmailBtn.addEventListener('click', () => {
         const newEmail = editEmailInput.value.trim();
         if (newEmail && newEmail.includes('@')) {
-            localStorage.setItem('profileEmail', newEmail);
+            localStorage.setItem(getUserScopedKey('profileEmail'), newEmail);
             displayEmail.textContent = newEmail;
             showToast('Email güncellendi!', 'success');
             showProfileSettingsView();
@@ -865,7 +872,7 @@ if (savePasswordBtn) {
     savePasswordBtn.addEventListener('click', () => {
         const newPassword = editPasswordInput.value.trim();
         if (newPassword && newPassword.length >= 6) {
-            localStorage.setItem('profilePassword', newPassword);
+            localStorage.setItem(getUserScopedKey('profilePassword'), newPassword);
             showToast('Şifre güncellendi!', 'success');
             showProfileSettingsView();
         } else {
@@ -879,6 +886,23 @@ if (logoutBtn) {
         closeProfileDropdown();
         try {
             await signOut(auth);
+            // Reset theme settings to defaults
+            applyThemeSettings(defaultThemeSettings);
+            if (bgColorInput) bgColorInput.value = defaultThemeSettings.bgColor;
+            if (uiTextColorInput) uiTextColorInput.value = defaultThemeSettings.uiText;
+            if (noteTextColorInput) noteTextColorInput.value = defaultThemeSettings.noteText;
+            if (uiFontSelect) uiFontSelect.value = defaultThemeSettings.uiFont;
+            if (noteFontSelect) noteFontSelect.value = defaultThemeSettings.noteFont;
+            if (fontSizeInput) fontSizeInput.value = defaultThemeSettings.fontSize;
+            if (themeModeButton) {
+                themeModeButton.classList.toggle('active', defaultThemeSettings.themeMode === 'dark');
+                themeModeButton.textContent = defaultThemeSettings.themeMode === 'dark' ? 'Karanlık' : 'Aydınlık';
+            }
+            // Reset profile image
+            if (profileImagePreview) {
+                profileImagePreview.src = '';
+                profileImagePreview.style.display = 'none';
+            }
             showToast('Çıkış yapıldı.', 'success');
         } catch (error) {
             showToast('Çıkış Hatası: ' + error.message, 'error');
@@ -914,7 +938,7 @@ if (updateProfileBtn) {
     updateProfileBtn.addEventListener('click', () => {
         // Save profile picture to localStorage
         if (profileImagePreview.src && profileImagePreview.style.display !== 'none') {
-            localStorage.setItem('savedProfilePic', profileImagePreview.src);
+            localStorage.setItem(getUserScopedKey('savedProfilePic'), profileImagePreview.src);
             updateProfileIcon(profileImagePreview.src);
             showToast('Profil fotoğrafı güncellendi!', 'success');
         } else {
@@ -987,6 +1011,23 @@ logoutBtn?.addEventListener('click', async () => {
     closeSidebar();
     try {
         await signOut(auth);
+        // Reset theme settings to defaults
+        applyThemeSettings(defaultThemeSettings);
+        if (bgColorInput) bgColorInput.value = defaultThemeSettings.bgColor;
+        if (uiTextColorInput) uiTextColorInput.value = defaultThemeSettings.uiText;
+        if (noteTextColorInput) noteTextColorInput.value = defaultThemeSettings.noteText;
+        if (uiFontSelect) uiFontSelect.value = defaultThemeSettings.uiFont;
+        if (noteFontSelect) noteFontSelect.value = defaultThemeSettings.noteFont;
+        if (fontSizeInput) fontSizeInput.value = defaultThemeSettings.fontSize;
+        if (themeModeButton) {
+            themeModeButton.classList.toggle('active', defaultThemeSettings.themeMode === 'dark');
+            themeModeButton.textContent = defaultThemeSettings.themeMode === 'dark' ? 'Karanlık' : 'Aydınlık';
+        }
+        // Reset profile image
+        if (profileImagePreview) {
+            profileImagePreview.src = '';
+            profileImagePreview.style.display = 'none';
+        }
         showToast('Çıkış yapıldı.', 'success');
     } catch (error) {
         showToast('Çıkış Hatası: ' + error.message, 'error');
@@ -1059,7 +1100,7 @@ onAuthStateChanged(auth, async (user) => {
             userNameDisplay.textContent = user.displayName || 'Kullanıcı';
         }
         if (profileIcon) {
-            const savedProfilePic = localStorage.getItem('savedProfilePic');
+            const savedProfilePic = localStorage.getItem(getUserScopedKey('savedProfilePic'));
             if (savedProfilePic) {
                 updateProfileIcon(savedProfilePic);
             } else {
