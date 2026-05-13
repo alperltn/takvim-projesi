@@ -616,6 +616,11 @@ function showThemeSettingsView() {
     themeSettingsView?.classList.remove('hidden');
 }
 
+function showMainSettingsView() {
+    mainSettingsView?.classList.remove('hidden');
+    themeSettingsView?.classList.add('hidden');
+}
+
 function openSidebar() {
     if (!sidebar || !sidebarOverlay) return;
     showMainSettingsView();
