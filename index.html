@@ -79,20 +79,39 @@
             <button id="closeSidebarBtn" class="close-sidebar-btn" aria-label="Kapat">&times;</button>
         </div>
         <div class="sidebar-content">
-            <div class="sidebar-category">
-                <h3>🎨 Tema</h3>
-                <button class="sidebar-item">Karanlık Mod</button>
-                <button class="sidebar-item">Aydınlık Mod</button>
+            <div id="mainSettingsView">
+                <button class="sidebar-item sidebar-nav-button" id="openThemeSettingsBtn">🎨 Tema</button>
+                <button class="sidebar-item">👁️ Görünüm</button>
+                <button class="sidebar-item">👤 Hesap</button>
             </div>
-            <div class="sidebar-category">
-                <h3>👁️ Görünüm</h3>
-                <button class="sidebar-item">Takvim Görünümü</button>
-                <button class="sidebar-item">Liste Görünümü</button>
-            </div>
-            <div class="sidebar-category">
-                <h3>👤 Hesap</h3>
-                <button class="sidebar-item">Profil Düzenle</button>
-                <button class="sidebar-item">Hesap Ayarları</button>
+            <div id="themeSettingsView" class="settings-panel hidden">
+                <button id="backToMainBtn" class="sidebar-back-btn">← Geri</button>
+                <div class="settings-field">
+                    <label for="background-color-picker">Arkaplan Rengi</label>
+                    <input type="color" id="background-color-picker" value="#1a1a1a" />
+                </div>
+                <div class="settings-field">
+                    <label for="text-color-picker">Yazı Rengi</label>
+                    <input type="color" id="text-color-picker" value="#ffffff" />
+                </div>
+                <div class="settings-field">
+                    <label for="font-family-select">Font Tipi</label>
+                    <select id="font-family-select">
+                        <option value="Segoe UI">Segoe UI</option>
+                        <option value="Arial">Arial</option>
+                        <option value="Roboto">Roboto</option>
+                        <option value="Inter">Inter</option>
+                        <option value="Verdana">Verdana</option>
+                    </select>
+                </div>
+                <div class="settings-field">
+                    <label for="font-size-range">Yazı Boyutu</label>
+                    <input type="range" id="font-size-range" min="14" max="20" value="16" />
+                </div>
+                <div class="settings-field toggle-switch" id="themeModeToggle">
+                    <span>Karanlık / Aydınlık Mod</span>
+                    <button type="button" class="toggle-button active">Karanlık</button>
+                </div>
             </div>
         </div>
         <div class="sidebar-footer">

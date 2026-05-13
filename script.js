@@ -494,6 +494,10 @@ const authSubmitButton = document.getElementById('authSubmitButton');
 const toggleAuthMode = document.getElementById('toggleAuthMode');
 const profileIcon = document.getElementById('profileIcon');
 const userNameDisplay = document.getElementById('userNameDisplay');
+const mainSettingsView = document.getElementById('mainSettingsView');
+const themeSettingsView = document.getElementById('themeSettingsView');
+const openThemeSettingsBtn = document.getElementById('openThemeSettingsBtn');
+const backToMainBtn = document.getElementById('backToMainBtn');
 
 const authInputFields = [registerUsername, emailInput, passwordInput];
 const loginButton = document.getElementById('login-btn') || authSubmitButton;
@@ -530,7 +534,18 @@ function closeAuthModal() {
     authModalOverlay.setAttribute('aria-hidden', 'true');
 }
 
+function showMainSettingsView() {
+    mainSettingsView?.classList.remove('hidden');
+    themeSettingsView?.classList.add('hidden');
+}
+
+function showThemeSettingsView() {
+    mainSettingsView?.classList.add('hidden');
+    themeSettingsView?.classList.remove('hidden');
+}
+
 function openSidebar() {
+    showMainSettingsView();
     sidebar.classList.add('active');
     sidebarOverlay.classList.add('active');
 }
@@ -576,6 +591,14 @@ profileIcon.addEventListener('click', () => {
 
 settingsBtn.addEventListener('click', () => {
     openSidebar();
+});
+
+openThemeSettingsBtn?.addEventListener('click', () => {
+    showThemeSettingsView();
+});
+
+backToMainBtn?.addEventListener('click', () => {
+    showMainSettingsView();
 });
 
 closeSidebarBtn.addEventListener('click', () => {
