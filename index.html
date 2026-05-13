@@ -136,18 +136,36 @@
                     </div>
                 </div>
                 <div class="settings-field">
-                    <label for="profileUsername">Kullanıcı Adı</label>
-                    <input type="text" id="profileUsername" />
+                    <label>Kullanıcı Adı</label>
+                    <p id="displayUsername" class="profile-display-text"></p>
+                    <a href="#" id="editUsernameLink" class="profile-edit-link">Kullanıcı adı değiştir</a>
                 </div>
                 <div class="settings-field">
-                    <label for="profileEmail">Email</label>
-                    <input type="email" id="profileEmail" readonly />
+                    <label>Email</label>
+                    <p id="displayEmail" class="profile-display-text"></p>
+                    <a href="#" id="editEmailLink" class="profile-edit-link">Email değiştirme</a>
                 </div>
                 <div class="settings-field">
                     <label for="profilePassword">Yeni Şifre</label>
                     <input type="password" id="profilePassword" placeholder="Değiştirmek istemiyorsanız boş bırakın" />
                 </div>
                 <button id="updateProfileBtn" class="update-profile-btn">Güncelle</button>
+            </div>
+            <div id="editUsernameView" class="settings-panel hidden">
+                <button id="backToProfileFromUsernameBtn" class="sidebar-back-btn">← Geri</button>
+                <div class="settings-field">
+                    <label for="editUsernameInput">Yeni Kullanıcı Adı</label>
+                    <input type="text" id="editUsernameInput" placeholder="Yeni kullanıcı adınızı girin" />
+                </div>
+                <button id="saveUsernameBtn" class="save-edit-btn">Kaydet</button>
+            </div>
+            <div id="editEmailView" class="settings-panel hidden">
+                <button id="backToProfileFromEmailBtn" class="sidebar-back-btn">← Geri</button>
+                <div class="settings-field">
+                    <label for="editEmailInput">Yeni Email</label>
+                    <input type="email" id="editEmailInput" placeholder="Yeni email adresinizi girin" />
+                </div>
+                <button id="saveEmailBtn" class="save-edit-btn">Kaydet</button>
             </div>
         </div>
         <div class="sidebar-footer">

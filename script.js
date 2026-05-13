@@ -498,9 +498,13 @@ const userNameDisplay = document.getElementById('userNameDisplay');
 const mainSettingsView = document.getElementById('mainSettingsView');
 const themeSettingsView = document.getElementById('themeSettingsView');
 const profileSettingsView = document.getElementById('profileSettingsView');
+const editUsernameView = document.getElementById('editUsernameView');
+const editEmailView = document.getElementById('editEmailView');
 const openThemeSettingsBtn = document.getElementById('openThemeSettingsBtn');
 const backToMainBtn = document.getElementById('backToMainBtn');
 const backToMainFromProfileBtn = document.getElementById('backToMainFromProfileBtn');
+const backToProfileFromUsernameBtn = document.getElementById('backToProfileFromUsernameBtn');
+const backToProfileFromEmailBtn = document.getElementById('backToProfileFromEmailBtn');
 const profileMenuBtn = document.getElementById('profileMenuBtn');
 const bgColorInput = document.getElementById('bgColor');
 const uiTextColorInput = document.getElementById('uiTextColor');
@@ -509,6 +513,14 @@ const uiFontSelect = document.getElementById('uiFont');
 const noteFontSelect = document.getElementById('noteFont');
 const fontSizeInput = document.getElementById('fontSize');
 const themeModeButton = document.querySelector('#themeModeToggle .toggle-button');
+const displayUsername = document.getElementById('displayUsername');
+const displayEmail = document.getElementById('displayEmail');
+const editUsernameLink = document.getElementById('editUsernameLink');
+const editEmailLink = document.getElementById('editEmailLink');
+const editUsernameInput = document.getElementById('editUsernameInput');
+const editEmailInput = document.getElementById('editEmailInput');
+const saveUsernameBtn = document.getElementById('saveUsernameBtn');
+const saveEmailBtn = document.getElementById('saveEmailBtn');
 
 const authInputFields = [registerUsername, emailInput, passwordInput];
 const loginButton = document.getElementById('login-btn') || authSubmitButton;
@@ -638,6 +650,35 @@ function showMainSettingsView() {
 function showProfileSettingsView() {
     mainSettingsView?.classList.add('hidden');
     profileSettingsView?.classList.remove('hidden');
+    editUsernameView?.classList.add('hidden');
+    editEmailView?.classList.add('hidden');
+    loadProfileDisplay();
+}
+
+function showEditUsernameView() {
+    profileSettingsView?.classList.add('hidden');
+    editUsernameView?.classList.remove('hidden');
+    editUsernameInput.value = displayUsername.textContent || '';
+    editUsernameInput.focus();
+}
+
+function showEditEmailView() {
+    profileSettingsView?.classList.add('hidden');
+    editEmailView?.classList.remove('hidden');
+    editEmailInput.value = displayEmail.textContent || '';
+    editEmailInput.focus();
+}
+
+function loadProfileDisplay() {
+    const savedUsername = localStorage.getItem('profileUsername');
+    const savedEmail = localStorage.getItem('profileEmail');
+    
+    if (displayUsername) {
+        displayUsername.textContent = savedUsername || (auth.currentUser?.displayName || 'Kullanıcı');
+    }
+    if (displayEmail) {
+        displayEmail.textContent = savedEmail || (auth.currentUser?.email || '');
+    }
 }
 
 function openSidebar() {
@@ -723,6 +764,63 @@ if (profileMenuBtn) {
 if (backToMainFromProfileBtn) {
     backToMainFromProfileBtn.addEventListener('click', () => {
         showMainSettingsView();
+    });
+}
+
+if (editUsernameLink) {
+    editUsernameLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        showEditUsernameView();
+    });
+}
+
+if (editEmailLink) {
+    editEmailLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        showEditEmailView();
+    });
+}
+
+if (backToProfileFromUsernameBtn) {
+    backToProfileFromUsernameBtn.addEventListener('click', () => {
+        showProfileSettingsView();
+    });
+}
+
+if (backToProfileFromEmailBtn) {
+    backToProfileFromEmailBtn.addEventListener('click', () => {
+        showProfileSettingsView();
+    });
+}
+
+if (saveUsernameBtn) {
+    saveUsernameBtn.addEventListener('click', () => {
+        const newUsername = editUsernameInput.value.trim();
+        if (newUsername) {
+            localStorage.setItem('profileUsername', newUsername);
+            displayUsername.textContent = newUsername;
+            if (userNameDisplay) {
+                userNameDisplay.textContent = newUsername;
+            }
+            showToast('Kullanıcı adı güncellendi!', 'success');
+            showProfileSettingsView();
+        } else {
+            showToast('Lütfen bir kullanıcı adı girin.', 'error');
+        }
+    });
+}
+
+if (saveEmailBtn) {
+    saveEmailBtn.addEventListener('click', () => {
+        const newEmail = editEmailInput.value.trim();
+        if (newEmail && newEmail.includes('@')) {
+            localStorage.setItem('profileEmail', newEmail);
+            displayEmail.textContent = newEmail;
+            showToast('Email güncellendi!', 'success');
+            showProfileSettingsView();
+        } else {
+            showToast('Lütfen geçerli bir email adresi girin.', 'error');
+        }
     });
 }
 

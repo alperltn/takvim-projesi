@@ -501,6 +501,57 @@ body {
     background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
 }
 
+.profile-display-text {
+    margin: 0;
+    padding: 10px 14px;
+    background: rgba(255, 255, 255, 0.04);
+    border-radius: 10px;
+    color: var(--ui-text);
+    font-size: 0.95rem;
+    font-weight: 500;
+    word-break: break-all;
+}
+
+.profile-edit-link {
+    display: inline-block;
+    margin-top: 6px;
+    font-size: 0.85rem;
+    color: var(--accent-light);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s ease;
+}
+
+.profile-edit-link:hover {
+    color: var(--accent);
+    text-decoration: underline;
+}
+
+.save-edit-btn {
+    width: 100%;
+    padding: 14px 16px;
+    border: none;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
+    color: white;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+    margin-top: 8px;
+}
+
+.save-edit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(99, 102, 241, 0.5);
+    background: linear-gradient(135deg, var(--accent-hover) 0%, var(--accent) 100%);
+}
+
+.save-edit-btn:active {
+    transform: translateY(0);
+}
+
 @keyframes fadeIn {
     from {
         opacity: 0;
