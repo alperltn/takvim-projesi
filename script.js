@@ -494,6 +494,24 @@ const authSubmitButton = document.getElementById('authSubmitButton');
 const toggleAuthMode = document.getElementById('toggleAuthMode');
 const profileIcon = document.getElementById('profileIcon');
 const userNameDisplay = document.getElementById('userNameDisplay');
+
+const authInputFields = [registerUsername, emailInput, passwordInput];
+const loginButton = document.getElementById('login-btn') || authSubmitButton;
+const registerButton = document.getElementById('register-btn') || authSubmitButton;
+
+authInputFields.forEach((input) => {
+    if (!input) return;
+    input.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            if (authMode === 'login') {
+                loginButton.click();
+            } else {
+                registerButton.click();
+            }
+        }
+    });
+});
 const settingsBtn = document.getElementById('settingsBtn');
 const sidebar = document.getElementById('sidebar');
 const sidebarOverlay = document.getElementById('sidebarOverlay');
