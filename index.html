@@ -7,29 +7,26 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="profile-container">
-        <button id="profileIcon" class="profile-icon" aria-label="Profil">
-            <span class="profile-icon-text">👤</span>
-        </button>
-        <span id="userNameDisplay" class="user-name-display"></span>
-        <div id="profileMenu" class="profile-menu">
-            <button id="signOutBtn" type="button">Çıkış Yap</button>
-        </div>
-    </div>
     <div class="container">
         <div class="calendar-wrapper">
             <!-- Header -->
             <div class="calendar-header">
-                <button class="btn-nav btn-prev" id="prevBtn" aria-label="Önceki ay">
-                    <span>&larr;</span>
-                </button>
+                <div class="header-left">
+                    <button id="profileIcon" class="profile-icon" aria-label="Profil">
+                        <span class="profile-icon-text">👤</span>
+                    </button>
+                    <span id="userNameDisplay" class="user-name-display"></span>
+                    <div id="profileMenu" class="profile-menu">
+                        <button id="signOutBtn" type="button">Çıkış Yap</button>
+                    </div>
+                </div>
                 
                 <div class="month-year">
                     <h1 id="monthYear"></h1>
                 </div>
                 
-                <button class="btn-nav btn-next" id="nextBtn" aria-label="Sonraki ay">
-                    <span>&rarr;</span>
+                <button id="settingsBtn" class="settings-btn" aria-label="Ayarlar">
+                    <span>⚙️</span>
                 </button>
             </div>
 
@@ -51,7 +48,13 @@
 
             <!-- Footer with today button -->
             <div class="calendar-footer">
+                <button class="btn-nav btn-prev" id="prevBtn" aria-label="Önceki ay">
+                    <span>&larr;</span>
+                </button>
                 <button class="btn-today" id="todayBtn">Bugün</button>
+                <button class="btn-nav btn-next" id="nextBtn" aria-label="Sonraki ay">
+                    <span>&rarr;</span>
+                </button>
             </div>
         </div>
     </div>
