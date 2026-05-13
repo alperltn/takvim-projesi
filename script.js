@@ -525,7 +525,7 @@ const saveUsernameBtn = document.getElementById('saveUsernameBtn');
 const saveEmailBtn = document.getElementById('saveEmailBtn');
 const savePasswordBtn = document.getElementById('savePasswordBtn');
 const profileDropdown = document.getElementById('profileDropdown');
-const dropdownLogoutBtn = document.getElementById('dropdownLogoutBtn');
+const logoutBtn = document.getElementById('logoutBtn');
 
 const authInputFields = [registerUsername, emailInput, passwordInput];
 const loginButton = document.getElementById('login-btn') || authSubmitButton;
@@ -548,7 +548,6 @@ const settingsBtn = document.getElementById('settingsBtn');
 const sidebar = document.getElementById('sidebar');
 const sidebarOverlay = document.getElementById('sidebarOverlay');
 const closeSidebarBtn = document.getElementById('closeSidebarBtn');
-const logoutBtn = document.getElementById('logoutBtn');
 let authMode = 'login';
 const themeStorageKeys = {
     bgColor: 'savedBgColor',
@@ -683,13 +682,13 @@ function showEditPasswordView() {
 
 function toggleProfileDropdown() {
     if (profileDropdown) {
-        profileDropdown.classList.toggle('active');
+        profileDropdown.classList.toggle('show');
     }
 }
 
 function closeProfileDropdown() {
     if (profileDropdown) {
-        profileDropdown.classList.remove('active');
+        profileDropdown.classList.remove('show');
     }
 }
 
@@ -875,8 +874,8 @@ if (savePasswordBtn) {
     });
 }
 
-if (dropdownLogoutBtn) {
-    dropdownLogoutBtn.addEventListener('click', async () => {
+if (logoutBtn) {
+    logoutBtn.addEventListener('click', async () => {
         closeProfileDropdown();
         try {
             await signOut(auth);
