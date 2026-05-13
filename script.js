@@ -617,12 +617,14 @@ function showThemeSettingsView() {
 }
 
 function openSidebar() {
+    if (!sidebar || !sidebarOverlay) return;
     showMainSettingsView();
     sidebar.classList.add('active');
     sidebarOverlay.classList.add('active');
 }
 
 function closeSidebar() {
+    if (!sidebar || !sidebarOverlay) return;
     sidebar.classList.remove('active');
     sidebarOverlay.classList.remove('active');
 }
@@ -652,26 +654,34 @@ function setAuthMode(mode) {
     }
 }
 
-profileIcon.addEventListener('click', () => {
-    if (auth.currentUser) {
+if (profileIcon) {
+    profileIcon.addEventListener('click', () => {
+        if (auth.currentUser) {
+            openSidebar();
+        } else {
+            setAuthMode('login');
+            openAuthModal();
+        }
+    });
+}
+
+if (settingsBtn) {
+    settingsBtn.addEventListener('click', () => {
         openSidebar();
-    } else {
-        setAuthMode('login');
-        openAuthModal();
-    }
-});
+    });
+}
 
-settingsBtn.addEventListener('click', () => {
-    openSidebar();
-});
+if (openThemeSettingsBtn) {
+    openThemeSettingsBtn.addEventListener('click', () => {
+        showThemeSettingsView();
+    });
+}
 
-openThemeSettingsBtn?.addEventListener('click', () => {
-    showThemeSettingsView();
-});
-
-backToMainBtn?.addEventListener('click', () => {
-    showMainSettingsView();
-});
+if (backToMainBtn) {
+    backToMainBtn.addEventListener('click', () => {
+        showMainSettingsView();
+    });
+}
 
 bgColorInput?.addEventListener('input', (event) => {
     updateThemeSetting(themeStorageKeys.bgColor, '--bg-color', event.target.value);
@@ -721,13 +731,17 @@ themeModeButton?.addEventListener('click', () => {
     }
 });
 
-closeSidebarBtn.addEventListener('click', () => {
-    closeSidebar();
-});
+if (closeSidebarBtn) {
+    closeSidebarBtn.addEventListener('click', () => {
+        closeSidebar();
+    });
+}
 
-sidebarOverlay.addEventListener('click', () => {
-    closeSidebar();
-});
+if (sidebarOverlay) {
+    sidebarOverlay.addEventListener('click', () => {
+        closeSidebar();
+    });
+}
 
 logoutBtn.addEventListener('click', async () => {
     closeSidebar();
