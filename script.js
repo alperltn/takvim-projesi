@@ -1025,17 +1025,48 @@ if (profileImageInput && profileImagePreview) {
 }
 
 if (updateProfileBtn) {
-    updateProfileBtn.addEventListener('click', async () => {
-        if (profileImagePreview.src && profileImagePreview.style.display !== 'none' && auth.currentUser) {
-            try {
-                await saveProfilePicture(auth.currentUser.uid, profileImagePreview.src);
-                updateProfileIcon(profileImagePreview.src);
-                showToast('Profil fotoğrafı güncellendi!', 'success');
-            } catch (error) {
-                showToast('Hata: ' + error.message, 'error');
+    updateProfileBtn.addEventListener('click', async (e) => {
+        const button = e.currentTarget;
+        button.disabled = true;
+        const previousText = button.textContent;
+        button.textContent = 'Güncelleniyor...';
+
+        try {
+            const user = auth.currentUser;
+            if (!user) {
+                showToast('Lütfen önce giriş yapın.', 'error');
+                return;
             }
-        } else {
-            showToast('Lütfen bir fotoğraf seçin.', 'error');
+
+            const username = (editUsernameInput?.value?.trim()) || displayUsername?.textContent?.trim() || '';
+            let profilePic = null;
+            if (profileImagePreview && profileImagePreview.src && profileImagePreview.src.startsWith('data:image')) {
+                profilePic = profileImagePreview.src;
+            }
+
+            const payload = {};
+            if (username) payload.username = username;
+            if (profilePic) payload.profilePic = profilePic;
+
+            if (Object.keys(payload).length === 0) {
+                showToast('Güncellenecek profil verisi bulunamadı.', 'error');
+                return;
+            }
+
+            await setDoc(doc(db, 'users', user.uid), payload, { merge: true });
+            if (profilePic) {
+                updateProfileIcon(profilePic);
+            }
+            if (username && user.displayName !== username) {
+                await updateProfile(user, { displayName: username });
+            }
+            showToast('Profil güncellendi', 'success');
+        } catch (error) {
+            console.error('❌ Profil güncellenirken hata:', error);
+            showToast('Profil güncellenirken hata oluştu.', 'error');
+        } finally {
+            button.disabled = false;
+            button.textContent = previousText || 'Güncelle';
         }
     });
 }
