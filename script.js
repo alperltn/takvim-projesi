@@ -1003,21 +1003,41 @@ if (profileImageInput && profileImagePreview) {
             const reader = new FileReader();
             reader.onload = async (e) => {
                 const base64Data = e.target.result;
-                profileImagePreview.src = base64Data;
-                profileImagePreview.style.display = 'block';
+                const image = new Image();
+                image.onload = async () => {
+                    const maxDimension = 500;
+                    let { width, height } = image;
+                    const ratio = Math.min(maxDimension / width, maxDimension / height, 1);
+                    width = Math.round(width * ratio);
+                    height = Math.round(height * ratio);
 
-                const user = auth.currentUser;
-                if (user) {
-                    try {
-                        await setDoc(doc(db, 'users', user.uid), {
-                            profilePic: e.target.result
-                        }, { merge: true });
-                        console.log('✅ Profil fotoğrafı Firestore\'a kaydedildi');
-                    } catch (error) {
-                        console.error('❌ Profil fotoğrafı kaydedilirken hata:', error);
-                        showToast('Profil fotoğrafı kaydedilemedi.', 'error');
+                    const canvas = document.createElement('canvas');
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(image, 0, 0, width, height);
+
+                    const compressedData = canvas.toDataURL('image/jpeg', 0.6);
+                    profileImagePreview.src = compressedData;
+                    profileImagePreview.style.display = 'block';
+
+                    const user = auth.currentUser;
+                    if (user) {
+                        try {
+                            await setDoc(doc(db, 'users', user.uid), {
+                                profilePic: compressedData
+                            }, { merge: true });
+                            console.log('✅ Profil fotoğrafı Firestore\'a kaydedildi');
+                        } catch (error) {
+                            console.error('❌ Profil fotoğrafı kaydedilirken hata:', error);
+                            showToast('Profil fotoğrafı kaydedilemedi.', 'error');
+                        }
                     }
-                }
+                };
+                image.onerror = () => {
+                    showToast('Görsel yüklenirken hata oluştu.', 'error');
+                };
+                image.src = base64Data;
             };
             reader.readAsDataURL(file);
         }
