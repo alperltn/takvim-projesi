@@ -1006,11 +1006,11 @@ if (profileImageInput && profileImagePreview) {
                 profileImagePreview.src = base64Data;
                 profileImagePreview.style.display = 'block';
 
-                const currentUser = auth.currentUser;
-                if (currentUser) {
+                const user = auth.currentUser;
+                if (user) {
                     try {
-                        await setDoc(doc(db, 'users', currentUser.uid), {
-                            profilePic: base64Data
+                        await setDoc(doc(db, 'users', user.uid), {
+                            profilePic: e.target.result
                         }, { merge: true });
                         console.log('✅ Profil fotoğrafı Firestore\'a kaydedildi');
                     } catch (error) {
@@ -1122,11 +1122,12 @@ onAuthStateChanged(auth, async (user) => {
         }
         
         // Load and apply profile picture
-        const profilePic = await loadProfilePicture(user.uid);
-        if (profilePic && profileIcon) {
-            updateProfileIcon(profilePic);
+        const userDoc = await getDoc(doc(db, 'users', user.uid));
+        const userData = userDoc.exists() ? userDoc.data() : {};
+        if (userData.profilePic && profileIcon) {
+            updateProfileIcon(userData.profilePic);
             if (profileImagePreview) {
-                profileImagePreview.src = profilePic;
+                profileImagePreview.src = userData.profilePic;
                 profileImagePreview.style.display = 'block';
             }
         } else if (profileIcon) {
