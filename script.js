@@ -621,11 +621,16 @@ function loadThemeSettings() {
     // Load saved profile picture
     const savedProfilePic = localStorage.getItem(getUserScopedKey('savedProfilePic'));
     if (savedProfilePic) {
-        if (profileImagePreview) {
-            profileImagePreview.src = savedProfilePic;
-            profileImagePreview.style.display = 'block';
+        try {
+            if (profileImagePreview) {
+                profileImagePreview.src = savedProfilePic;
+                profileImagePreview.style.display = 'block';
+            }
+            updateProfileIcon(savedProfilePic);
+        } catch (error) {
+            console.warn('Profil fotoğrafı yüklenirken hata oluştu:', error);
+            // Continue execution even if profile picture fails
         }
-        updateProfileIcon(savedProfilePic);
     } else {
         // Reset profile preview if no saved image
         if (profileImagePreview) {
@@ -731,7 +736,12 @@ function closeSidebar() {
 }
 
 function updateProfileIcon(imageSrc) {
-    if (profileIcon) {
+    // Guard against null or undefined imageSrc
+    if (!imageSrc || !profileIcon) {
+        return;
+    }
+    
+    try {
         // Clear existing content
         profileIcon.innerHTML = '';
         // Add image
@@ -743,7 +753,19 @@ function updateProfileIcon(imageSrc) {
         img.style.borderRadius = '50%';
         img.alt = 'Profil Fotoğrafı';
         profileIcon.appendChild(img);
+    } catch (error) {
+        console.warn('Profil fotoğrafı yüklenirken hata oluştu:', error);
+        // Failsafe: show initials instead
     }
+}
+
+function getUserInitials(displayName) {
+    if (!displayName) {
+        return '👤';
+    }
+    const parts = displayName.trim().split(/\s+/);
+    const initials = parts.map(part => part[0].toUpperCase()).slice(0, 2).join('');
+    return initials || '👤';
 }
 
 function setAuthMode(mode) {
@@ -1106,11 +1128,21 @@ onAuthStateChanged(auth, async (user) => {
             userNameDisplay.textContent = user.displayName || 'Kullanıcı';
         }
         if (profileIcon) {
-            const savedProfilePic = localStorage.getItem(getUserScopedKey('savedProfilePic'));
-            if (savedProfilePic) {
-                updateProfileIcon(savedProfilePic);
-            } else {
-                // Reset profile icon to initials if no saved image
+            try {
+                const savedProfilePic = localStorage.getItem(getUserScopedKey('savedProfilePic'));
+                if (savedProfilePic) {
+                    updateProfileIcon(savedProfilePic);
+                } else {
+                    // Reset profile icon to initials if no saved image
+                    profileIcon.innerHTML = '';
+                    const iconSpan = document.createElement('span');
+                    iconSpan.className = 'profile-icon-text';
+                    iconSpan.textContent = getUserInitials(user.displayName || user.email);
+                    profileIcon.appendChild(iconSpan);
+                }
+            } catch (error) {
+                console.warn('Profil işleminde hata oluştu:', error);
+                // Failsafe: show initials
                 profileIcon.innerHTML = '';
                 const iconSpan = document.createElement('span');
                 iconSpan.className = 'profile-icon-text';
