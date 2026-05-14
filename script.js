@@ -99,9 +99,7 @@ async function loadUserSettings(uid) {
 async function saveProfilePicture(uid, imageData) {
     try {
         await setDoc(doc(db, 'users', uid), {
-            profile: {
-                picture: imageData
-            }
+            profilePic: imageData
         }, { merge: true });
         console.log('✅ Profil fotoğrafı Firestore\'a kaydedildi');
     } catch (error) {
@@ -115,9 +113,9 @@ async function saveProfilePicture(uid, imageData) {
 async function loadProfilePicture(uid) {
     try {
         const userDoc = await getDoc(doc(db, 'users', uid));
-        if (userDoc.exists() && userDoc.data().profile?.picture) {
+        if (userDoc.exists() && userDoc.data().profilePic) {
             console.log('✅ Profil fotoğrafı Firestore\'dan yüklendi');
-            return userDoc.data().profile.picture;
+            return userDoc.data().profilePic;
         }
     } catch (error) {
         console.error('❌ Profil fotoğrafı yüklenirken hata:', error);
@@ -1003,9 +1001,23 @@ if (profileImageInput && profileImagePreview) {
         const file = event.target.files[0];
         if (file) {
             const reader = new FileReader();
-            reader.onload = (e) => {
-                profileImagePreview.src = e.target.result;
+            reader.onload = async (e) => {
+                const base64Data = e.target.result;
+                profileImagePreview.src = base64Data;
                 profileImagePreview.style.display = 'block';
+
+                const currentUser = auth.currentUser;
+                if (currentUser) {
+                    try {
+                        await setDoc(doc(db, 'users', currentUser.uid), {
+                            profilePic: base64Data
+                        }, { merge: true });
+                        console.log('✅ Profil fotoğrafı Firestore\'a kaydedildi');
+                    } catch (error) {
+                        console.error('❌ Profil fotoğrafı kaydedilirken hata:', error);
+                        showToast('Profil fotoğrafı kaydedilemedi.', 'error');
+                    }
+                }
             };
             reader.readAsDataURL(file);
         }
