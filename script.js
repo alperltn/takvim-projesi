@@ -473,6 +473,89 @@ document.addEventListener('DOMContentLoaded', async () => {
     calendarInstance.render();
 });
 
+// ============================================
+// Event Modal Management
+// ============================================
+
+const eventModalOverlay = document.getElementById('eventModalOverlay');
+const eventModalBtn = document.getElementById('eventModalBtn');
+const closeEventModalBtn = document.getElementById('closeEventModalBtn');
+const closeEventBtn = document.getElementById('closeEventBtn');
+const saveEventBtn = document.getElementById('saveEventBtn');
+const eventAllDayCheckbox = document.getElementById('eventAllDay');
+const eventStartTimeInput = document.getElementById('eventStartTime');
+const eventEndTimeInput = document.getElementById('eventEndTime');
+
+function openEventModal() {
+    eventModalOverlay.classList.add('active');
+}
+
+function closeEventModal() {
+    eventModalOverlay.classList.remove('active');
+    document.getElementById('eventTitle').value = '';
+    document.getElementById('eventDescription').value = '';
+    eventStartTimeInput.value = '';
+    eventEndTimeInput.value = '';
+    eventAllDayCheckbox.checked = false;
+    eventStartTimeInput.style.opacity = '1';
+    eventStartTimeInput.disabled = false;
+    eventEndTimeInput.style.opacity = '1';
+    eventEndTimeInput.disabled = false;
+}
+
+if (eventModalBtn) {
+    eventModalBtn.addEventListener('click', () => {
+        openEventModal();
+    });
+}
+
+if (closeEventModalBtn) {
+    closeEventModalBtn.addEventListener('click', () => {
+        closeEventModal();
+    });
+}
+
+if (closeEventBtn) {
+    closeEventBtn.addEventListener('click', () => {
+        closeEventModal();
+    });
+}
+
+if (eventAllDayCheckbox) {
+    eventAllDayCheckbox.addEventListener('change', (e) => {
+        if (e.target.checked) {
+            eventStartTimeInput.disabled = true;
+            eventStartTimeInput.style.opacity = '0.5';
+            eventEndTimeInput.disabled = true;
+            eventEndTimeInput.style.opacity = '0.5';
+        } else {
+            eventStartTimeInput.disabled = false;
+            eventStartTimeInput.style.opacity = '1';
+            eventEndTimeInput.disabled = false;
+            eventEndTimeInput.style.opacity = '1';
+        }
+    });
+}
+
+if (saveEventBtn) {
+    saveEventBtn.addEventListener('click', () => {
+        const title = document.getElementById('eventTitle').value.trim();
+        const description = document.getElementById('eventDescription').value.trim();
+        const startTime = eventStartTimeInput.value;
+        const endTime = eventEndTimeInput.value;
+        const isAllDay = eventAllDayCheckbox.checked;
+
+        if (!title) {
+            showToast('Lütfen etkinlik adı girin.', 'error');
+            return;
+        }
+
+        console.log('Etkinlik verileri:', { title, description, startTime, endTime, isAllDay });
+        showToast('Etkinlik kaydedildi (Firestore bağlantısı yakında)!', 'success');
+        closeEventModal();
+    });
+}
+
 // ==========================================
 // KİMLİK DOĞRULAMA (AUTHENTICATION) İŞLEMLERİ
 // ==========================================
