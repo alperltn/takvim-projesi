@@ -363,12 +363,14 @@ class Calendar {
     async previousMonth() {
         this.currentDate.setMonth(this.currentDate.getMonth() - 1);
         await this.loadNotesFromFirestore();
+        await this.loadEventsFromFirestore();
         this.render();
     }
 
     async nextMonth() {
         this.currentDate.setMonth(this.currentDate.getMonth() + 1);
         await this.loadNotesFromFirestore();
+        await this.loadEventsFromFirestore();
         this.render();
     }
 
@@ -509,6 +511,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     new NoteModal();
     
     await calendarInstance.loadNotesFromFirestore();
+    await calendarInstance.loadEventsFromFirestore();
     calendarInstance.render();
 });
 

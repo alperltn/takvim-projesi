@@ -454,7 +454,6 @@ body {
     background-color: #1e1e24;
     color: #ffffff;
 }
-}
 
 .settings-field input[type="color"] {
     height: 46px;
@@ -1573,12 +1572,20 @@ body.light-mode .day:hover {
 /* Collapsible time container for event modal */
 .time-container {
     overflow: hidden;
-    transition: max-height 0.3s ease, opacity 0.25s ease;
-    max-height: 400px; /* expanded */
+    transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease, padding 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    max-height: 400px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    margin-bottom: 8px;
 }
 .time-container.collapsed {
     max-height: 0;
     opacity: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    border-color: transparent;
 }
 
 /* Day cell event strip */
@@ -1591,13 +1598,16 @@ body.light-mode .day:hover {
 
 .event-strip {
     margin-top: auto;
-    border-top: 1px solid rgba(255,255,255,0.2);
-    font-size: 11px;
-    padding: 2px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    font-size: 10px;
+    padding: 3px 2px 2px;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
-    color: var(--ui-text);
+    color: var(--accent-light);
+    width: 100%;
+    font-weight: 500;
+    letter-spacing: 0.01em;
 }
 
 /* iOS-style All Day Toggle */
@@ -1669,9 +1679,4 @@ body.light-mode .day:hover {
 
 .btn-event:active {
     transform: translateY(0);
-}
-
-        max-width: none;
-        margin-bottom: 8px;
-    }
 }
