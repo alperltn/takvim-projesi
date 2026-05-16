@@ -1680,3 +1680,82 @@ body.light-mode .day:hover {
 .btn-event:active {
     transform: translateY(0);
 }
+
+/* ============================================
+   Pickr Color Picker Styles
+   ============================================ */
+
+/* Color picker field layout: label sol, swatch sağ */
+.color-picker-field {
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 0 !important;
+    padding: 10px 14px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    transition: background var(--transition);
+}
+
+.color-picker-field:hover {
+    background: rgba(255, 255, 255, 0.07);
+}
+
+.color-picker-field label {
+    font-size: 0.92rem;
+    color: var(--ui-text);
+    margin: 0;
+    flex: 1;
+    cursor: default;
+}
+
+/* Pickr wrapper */
+.pickr {
+    flex-shrink: 0;
+    line-height: 0;
+}
+
+/* Renk swatch butonu */
+.pickr .pcr-button {
+    width: 34px !important;
+    height: 34px !important;
+    border-radius: 8px !important;
+    border: 2px solid rgba(255, 255, 255, 0.18) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35), inset 0 0 0 1px rgba(255,255,255,0.06) !important;
+    transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease !important;
+    cursor: pointer;
+}
+
+.pickr .pcr-button:hover {
+    border-color: var(--accent) !important;
+    transform: scale(1.08) !important;
+    box-shadow: 0 4px 14px rgba(99, 102, 241, 0.4) !important;
+}
+
+.pickr .pcr-button:focus {
+    outline: none !important;
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.3) !important;
+}
+
+/* Pickr panel (nano theme override) */
+.pcr-app[data-theme="nano"] {
+    border-radius: 14px !important;
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.55) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    overflow: hidden;
+}
+
+/* Save butonu */
+.pcr-app .pcr-save {
+    border-radius: 6px !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.02em !important;
+}
+
+/* Hex input */
+.pcr-app .pcr-result {
+    border-radius: 6px !important;
+    font-size: 0.85rem !important;
+    text-align: center;
+}

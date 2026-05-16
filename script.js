@@ -506,10 +506,11 @@ class NoteModal {
 // ============================================
 
 document.addEventListener('DOMContentLoaded', async () => {
-    loadThemeSettings();
+    initPickrs(defaultThemeSettings); // Önce Pickr'ları başlat
+    loadThemeSettings();              // Ardından Firestore'dan ayarları yükle (setPickrColors günceller)
     calendarInstance = new Calendar();
     new NoteModal();
-    
+
     await calendarInstance.loadNotesFromFirestore();
     await calendarInstance.loadEventsFromFirestore();
     calendarInstance.render();
@@ -711,9 +712,7 @@ const backToProfileFromUsernameBtn = document.getElementById('backToProfileFromU
 const backToProfileFromEmailBtn = document.getElementById('backToProfileFromEmailBtn');
 const backToProfileFromPasswordBtn = document.getElementById('backToProfileFromPasswordBtn');
 const profileMenuBtn = document.getElementById('profileMenuBtn');
-const bgColorInput = document.getElementById('bgColor');
-const uiTextColorInput = document.getElementById('uiTextColor');
-const noteTextColorInput = document.getElementById('noteTextColor');
+// Color pickers are now handled by Pickr instances (bgPickr, uiTextPickr, noteTextPickr)
 const uiFontSelect = document.getElementById('uiFont');
 const noteFontSelect = document.getElementById('noteFont');
 const fontSizeInput = document.getElementById('fontSize');
@@ -752,6 +751,91 @@ const defaultThemeSettings = {
 };
 
 // ============================================
+// Pickr Color Picker
+// ============================================
+
+let bgPickr = null;
+let uiTextPickr = null;
+let noteTextPickr = null;
+
+/**
+ * Positions the Pickr panel to the right of its button using
+ * position:fixed so sidebar overflow clipping is bypassed.
+ */
+function anchorPickrToRight(pickr) {
+    pickr.on('show', () => {
+        // Double rAF ensures we run after Popper.js updates the position
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                const root = pickr.getRoot();
+                if (!root || !root.app || !root.button) return;
+                const rect = root.button.getBoundingClientRect();
+                const app = root.app;
+                app.style.setProperty('position', 'fixed', 'important');
+                app.style.setProperty('z-index', '9999', 'important');
+                app.style.setProperty('top', rect.top + 'px', 'important');
+                app.style.setProperty('left', (rect.right + 10) + 'px', 'important');
+                app.style.setProperty('transform', 'none', 'important');
+                app.style.setProperty('margin', '0', 'important');
+            });
+        });
+    });
+}
+
+function createPickr(elId, defaultColor, cssVar, settingKey) {
+    const pickr = Pickr.create({
+        el: elId,
+        theme: 'nano',
+        default: defaultColor || '#ffffff',
+        position: 'right-start',
+        components: {
+            preview: true,
+            opacity: false,
+            hue: true,
+            interaction: {
+                hex: true,
+                input: true,
+                save: true
+            }
+        }
+    });
+
+    anchorPickrToRight(pickr);
+
+    pickr.on('change', (color) => {
+        if (!color) return;
+        document.documentElement.style.setProperty(cssVar, color.toHEXA().toString());
+    });
+
+    pickr.on('save', async (color) => {
+        if (!color) return;
+        const hex = color.toHEXA().toString();
+        await updateThemeSettingAndSave(settingKey, cssVar, hex);
+        pickr.hide();
+    });
+
+    return pickr;
+}
+
+function initPickrs(settings) {
+    const s = settings || defaultThemeSettings;
+    bgPickr = createPickr('#color-picker-bg', s.bgColor, '--bg-color', 'savedBgColor');
+    uiTextPickr = createPickr('#color-picker-ui-text', s.uiText, '--ui-text', 'savedUiColor');
+    noteTextPickr = createPickr('#color-picker-note-text', s.noteText, '--note-text', 'savedNoteColor');
+}
+
+function setPickrColors(settings) {
+    const s = settings || defaultThemeSettings;
+    try {
+        if (bgPickr) bgPickr.setColor(s.bgColor || '#1a1a1a');
+        if (uiTextPickr) uiTextPickr.setColor(s.uiText || '#ffffff');
+        if (noteTextPickr) noteTextPickr.setColor(s.noteText || '#ffffff');
+    } catch (e) {
+        console.warn('Pickr setColor hatası:', e);
+    }
+}
+
+// ============================================
 // Theme Settings Management
 // ============================================
 
@@ -781,10 +865,8 @@ async function loadThemeSettings() {
     }
 
     applyThemeSettings(settings);
+    setPickrColors(settings);
 
-    if (bgColorInput) bgColorInput.value = settings.bgColor;
-    if (uiTextColorInput) uiTextColorInput.value = settings.uiText;
-    if (noteTextColorInput) noteTextColorInput.value = settings.noteText;
     if (uiFontSelect) uiFontSelect.value = settings.uiFont;
     if (noteFontSelect) noteFontSelect.value = settings.noteFont;
     if (fontSizeInput) fontSizeInput.value = settings.fontSize;
@@ -1176,9 +1258,7 @@ if (logoutBtn) {
         try {
             await signOut(auth);
             applyThemeSettings(defaultThemeSettings);
-            if (bgColorInput) bgColorInput.value = defaultThemeSettings.bgColor;
-            if (uiTextColorInput) uiTextColorInput.value = defaultThemeSettings.uiText;
-            if (noteTextColorInput) noteTextColorInput.value = defaultThemeSettings.noteText;
+            setPickrColors(defaultThemeSettings);
             if (uiFontSelect) uiFontSelect.value = defaultThemeSettings.uiFont;
             if (noteFontSelect) noteFontSelect.value = defaultThemeSettings.noteFont;
             if (fontSizeInput) fontSizeInput.value = defaultThemeSettings.fontSize;
@@ -1306,17 +1386,7 @@ if (updateProfileBtn) {
 // Event Listeners - Theme Settings
 // ============================================
 
-bgColorInput?.addEventListener('input', (event) => {
-    updateThemeSettingAndSave('savedBgColor', '--bg-color', event.target.value);
-});
-
-uiTextColorInput?.addEventListener('input', (event) => {
-    updateThemeSettingAndSave('savedUiColor', '--ui-text', event.target.value);
-});
-
-noteTextColorInput?.addEventListener('input', (event) => {
-    updateThemeSettingAndSave('savedNoteColor', '--note-text', event.target.value);
-});
+// Renk değişiklikleri Pickr'ın 'save' eventi ile yönetilmektedir (createPickr fonksiyonu içinde)
 
 uiFontSelect?.addEventListener('input', (event) => {
     updateThemeSettingAndSave('savedUiFont', '--ui-font', event.target.value);
@@ -1347,12 +1417,8 @@ themeModeButton?.addEventListener('click', async () => {
         await saveUserSettings(auth.currentUser.uid, settings);
     }
 
-    if (bgColorInput) {
-        bgColorInput.value = bgColor;
-    }
-    if (uiTextColorInput) {
-        uiTextColorInput.value = uiColor;
-    }
+    if (bgPickr) bgPickr.setColor(bgColor);
+    if (uiTextPickr) uiTextPickr.setColor(uiColor);
 
     if (themeModeButton) {
         themeModeButton.classList.toggle('active', nextMode === 'dark');
@@ -1427,9 +1493,7 @@ onAuthStateChanged(auth, async (user) => {
         
         // Reset theme to defaults
         applyThemeSettings(defaultThemeSettings);
-        if (bgColorInput) bgColorInput.value = defaultThemeSettings.bgColor;
-        if (uiTextColorInput) uiTextColorInput.value = defaultThemeSettings.uiText;
-        if (noteTextColorInput) noteTextColorInput.value = defaultThemeSettings.noteText;
+        setPickrColors(defaultThemeSettings);
         if (uiFontSelect) uiFontSelect.value = defaultThemeSettings.uiFont;
         if (noteFontSelect) noteFontSelect.value = defaultThemeSettings.noteFont;
         if (fontSizeInput) fontSizeInput.value = defaultThemeSettings.fontSize;

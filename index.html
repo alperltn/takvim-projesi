@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Aylık Takvim</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@simonwep/pickr@1.9.1/dist/themes/nano.min.css">
 </head>
 <body>
     <div class="toast-container" id="toast-container"></div>
@@ -91,17 +92,17 @@
             </div>
             <div id="themeSettingsView" class="settings-panel hidden">
                 <button id="backToMainBtn" class="sidebar-back-btn">← Geri</button>
-                <div class="settings-field">
-                    <label for="bgColor">Arkaplan Rengi</label>
-                    <input type="color" id="bgColor" value="#1a1a1a" />
+                <div class="settings-field color-picker-field">
+                    <label>Arkaplan Rengi</label>
+                    <div id="color-picker-bg"></div>
                 </div>
-                <div class="settings-field">
-                    <label for="uiTextColor">Arayüz Yazı Rengi</label>
-                    <input type="color" id="uiTextColor" value="#ffffff" />
+                <div class="settings-field color-picker-field">
+                    <label>Arayüz Yazı Rengi</label>
+                    <div id="color-picker-ui-text"></div>
                 </div>
-                <div class="settings-field">
-                    <label for="noteTextColor">Not Yazı Rengi</label>
-                    <input type="color" id="noteTextColor" value="#ffffff" />
+                <div class="settings-field color-picker-field">
+                    <label>Not Yazı Rengi</label>
+                    <div id="color-picker-note-text"></div>
                 </div>
                 <div class="settings-field">
                     <label for="uiFont">Arayüz Fontu</label>
@@ -255,6 +256,7 @@
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/@simonwep/pickr@1.9.1/dist/pickr.min.js"></script>
     <script type="module" src="script.js"></script>
 
     <!-- Toast Container -->
