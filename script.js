@@ -148,6 +148,7 @@ class Calendar {
         this.currentDate = new Date();
         this.selectedDate = null;
         this.notes = {}; // Store notes from Firestore
+        this.events = {}; // Store events from Firestore, keyed by YYYY-MM-DD
         
         // DOM Elements
         this.calendarGrid = document.getElementById('calendarGrid');
@@ -236,6 +237,36 @@ class Calendar {
         }
     }
 
+    /**
+     * Load events from Firestore (stored under users/{uid}.events array)
+     */
+    async loadEventsFromFirestore() {
+        try {
+            const currentUser = auth.currentUser;
+            if (!currentUser) {
+                this.events = {};
+                console.log('📛 Giriş yapılmadığı için etkinlikler temizlendi.');
+                return;
+            }
+
+            const userRef = doc(db, 'users', currentUser.uid);
+            const userSnap = await getDoc(userRef);
+            const data = userSnap.exists() ? userSnap.data() : {};
+            const eventsArray = Array.isArray(data.events) ? data.events : [];
+
+            this.events = {};
+            eventsArray.forEach((ev) => {
+                if (!ev || !ev.date) return;
+                if (!this.events[ev.date]) this.events[ev.date] = [];
+                this.events[ev.date].push(ev);
+            });
+
+            console.log('📥 Firestore\'dan etkinlikler yüklendi:', this.events);
+        } catch (error) {
+            console.error('❌ Etkinlikler Firestore\'dan çekilirken hata:', error);
+        }
+    }
+
     createDayElement(day, month, year, isCurrentMonth) {
         const dayElement = document.createElement('div');
         dayElement.className = 'day';
@@ -271,6 +302,14 @@ class Calendar {
                 notePreview.className = 'note-preview';
                 notePreview.textContent = savedNote;
                 dayElement.appendChild(notePreview);
+            }
+            // Events preview (show first event title in small strip)
+            const dayEvents = this.events && this.events[dateKey] ? this.events[dateKey] : null;
+            if (dayEvents && dayEvents.length > 0) {
+                const eventStrip = document.createElement('div');
+                eventStrip.className = 'event-strip';
+                eventStrip.textContent = dayEvents[0].title || '';
+                dayElement.appendChild(eventStrip);
             }
         }
 
@@ -485,6 +524,7 @@ const saveEventBtn = document.getElementById('saveEventBtn');
 const eventAllDayCheckbox = document.getElementById('eventAllDay');
 const eventStartTimeInput = document.getElementById('eventStartTime');
 const eventEndTimeInput = document.getElementById('eventEndTime');
+const eventTimeContainer = document.getElementById('eventTimeContainer');
 
 function openEventModal() {
     eventModalOverlay.classList.add('active');
@@ -505,6 +545,16 @@ function closeEventModal() {
 
 if (eventModalBtn) {
     eventModalBtn.addEventListener('click', () => {
+        // Transfer selected date from note modal to event modal
+        const noteModalOverlay = document.getElementById('modalOverlay');
+        if (noteModalOverlay && noteModalOverlay.dataset.selectedDate) {
+            eventModalOverlay.dataset.selectedDate = noteModalOverlay.dataset.selectedDate;
+        }
+        // ensure time container expanded
+        if (eventTimeContainer) {
+            eventTimeContainer.classList.remove('collapsed');
+            eventTimeContainer.style.maxHeight = eventTimeContainer.scrollHeight + 'px';
+        }
         openEventModal();
     });
 }
@@ -524,11 +574,21 @@ if (closeEventBtn) {
 if (eventAllDayCheckbox) {
     eventAllDayCheckbox.addEventListener('change', (e) => {
         if (e.target.checked) {
+            // collapse time container with animation
+            if (eventTimeContainer) {
+                eventTimeContainer.classList.add('collapsed');
+                eventTimeContainer.style.maxHeight = '0px';
+            }
             eventStartTimeInput.disabled = true;
             eventStartTimeInput.style.opacity = '0.5';
             eventEndTimeInput.disabled = true;
             eventEndTimeInput.style.opacity = '0.5';
         } else {
+            if (eventTimeContainer) {
+                eventTimeContainer.classList.remove('collapsed');
+                // set to scrollHeight to animate open
+                eventTimeContainer.style.maxHeight = eventTimeContainer.scrollHeight + 'px';
+            }
             eventStartTimeInput.disabled = false;
             eventStartTimeInput.style.opacity = '1';
             eventEndTimeInput.disabled = false;
@@ -538,7 +598,7 @@ if (eventAllDayCheckbox) {
 }
 
 if (saveEventBtn) {
-    saveEventBtn.addEventListener('click', () => {
+    saveEventBtn.addEventListener('click', async () => {
         const title = document.getElementById('eventTitle').value.trim();
         const description = document.getElementById('eventDescription').value.trim();
         const startTime = eventStartTimeInput.value;
@@ -550,8 +610,58 @@ if (saveEventBtn) {
             return;
         }
 
-        console.log('Etkinlik verileri:', { title, description, startTime, endTime, isAllDay });
-        showToast('Etkinlik kaydedildi (Firestore bağlantısı yakında)!', 'success');
+        // Determine date context
+        let selectedDateData = null;
+        try {
+            selectedDateData = JSON.parse(eventModalOverlay.dataset.selectedDate || null);
+        } catch (e) {
+            selectedDateData = null;
+        }
+
+        if (!selectedDateData) {
+            showToast('Etkinlik için tarih bilgisi bulunamadı.', 'error');
+            return;
+        }
+
+        const dateId = `${selectedDateData.year}-${String(selectedDateData.month + 1).padStart(2, '0')}-${String(selectedDateData.day).padStart(2, '0')}`;
+
+        const currentUser = auth.currentUser;
+        if (!currentUser) {
+            showToast('Etkinlik kaydetmek için lütfen giriş yapın!', 'error');
+            return;
+        }
+
+        const eventObj = {
+            id: Date.now().toString(),
+            title,
+            description,
+            startTime: isAllDay ? null : startTime,
+            endTime: isAllDay ? null : endTime,
+            allDay: !!isAllDay,
+            date: dateId,
+            createdAt: new Date().toISOString()
+        };
+
+        try {
+            const userRef = doc(db, 'users', currentUser.uid);
+            const userSnap = await getDoc(userRef);
+            const existingEvents = userSnap.exists() && Array.isArray(userSnap.data().events) ? userSnap.data().events : [];
+            existingEvents.push(eventObj);
+            await setDoc(userRef, { events: existingEvents }, { merge: true });
+
+            // Update local calendar state
+            if (!calendarInstance.events) calendarInstance.events = {};
+            if (!calendarInstance.events[dateId]) calendarInstance.events[dateId] = [];
+            calendarInstance.events[dateId].push(eventObj);
+            calendarInstance.render();
+
+            showToast('Etkinlik kaydedildi!', 'success');
+            console.log('Etkinlik kaydedildi:', eventObj);
+        } catch (error) {
+            console.error('Etkinlik kaydedilirken hata:', error);
+            showToast('Etkinlik kaydedilirken hata oluştu.', 'error');
+        }
+
         closeEventModal();
     });
 }
@@ -1287,6 +1397,7 @@ onAuthStateChanged(auth, async (user) => {
         // Load user's notes
         if (calendarInstance) {
             await calendarInstance.loadNotesFromFirestore();
+            await calendarInstance.loadEventsFromFirestore();
             calendarInstance.render();
         }
     } else {

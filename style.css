@@ -1272,9 +1272,21 @@ body.light-mode .day:hover {
     gap: 12px;
     padding: 20px 25px;
     border-top: 2px solid var(--border-color);
-    justify-content: flex-end;
+    justify-content: space-between;
+    align-items: center;
     background: var(--primary-bg);
     border-radius: 0 0 12px 12px;
+}
+
+.footer-left {
+    display: flex;
+    align-items: center;
+}
+
+.footer-right {
+    display: flex;
+    gap: 10px;
+    align-items: center;
 }
 
 .btn-cancel,
@@ -1556,6 +1568,36 @@ body.light-mode .day:hover {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 12px;
+}
+
+/* Collapsible time container for event modal */
+.time-container {
+    overflow: hidden;
+    transition: max-height 0.3s ease, opacity 0.25s ease;
+    max-height: 400px; /* expanded */
+}
+.time-container.collapsed {
+    max-height: 0;
+    opacity: 0;
+}
+
+/* Day cell event strip */
+.day {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+.event-strip {
+    margin-top: 8px;
+    padding: 6px 8px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    font-size: 0.75rem;
+    color: var(--ui-text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 /* iOS-style All Day Toggle */
