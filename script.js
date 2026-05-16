@@ -528,6 +528,29 @@ const eventTimeContainer = document.getElementById('eventTimeContainer');
 
 function openEventModal() {
     eventModalOverlay.classList.add('active');
+    
+    // Reset all day switch to false
+    if (eventAllDayCheckbox) {
+        eventAllDayCheckbox.checked = false;
+    }
+    
+    // Make time container visible
+    if (eventTimeContainer) {
+        eventTimeContainer.classList.remove('collapsed');
+        eventTimeContainer.style.maxHeight = eventTimeContainer.scrollHeight + 'px';
+    }
+    
+    // Clear time inputs
+    if (eventStartTimeInput) {
+        eventStartTimeInput.value = '';
+        eventStartTimeInput.style.opacity = '1';
+        eventStartTimeInput.disabled = false;
+    }
+    if (eventEndTimeInput) {
+        eventEndTimeInput.value = '';
+        eventEndTimeInput.style.opacity = '1';
+        eventEndTimeInput.disabled = false;
+    }
 }
 
 function closeEventModal() {
@@ -549,11 +572,6 @@ if (eventModalBtn) {
         const noteModalOverlay = document.getElementById('modalOverlay');
         if (noteModalOverlay && noteModalOverlay.dataset.selectedDate) {
             eventModalOverlay.dataset.selectedDate = noteModalOverlay.dataset.selectedDate;
-        }
-        // ensure time container expanded
-        if (eventTimeContainer) {
-            eventTimeContainer.classList.remove('collapsed');
-            eventTimeContainer.style.maxHeight = eventTimeContainer.scrollHeight + 'px';
         }
         openEventModal();
     });
