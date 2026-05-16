@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-import { getFirestore, doc, setDoc, getDoc, getDocs, collection, deleteDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+import { getFirestore, doc, setDoc, getDoc, getDocs, collection, deleteDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
 
 // ============================================
@@ -644,10 +644,7 @@ if (saveEventBtn) {
 
         try {
             const userRef = doc(db, 'users', currentUser.uid);
-            const userSnap = await getDoc(userRef);
-            const existingEvents = userSnap.exists() && Array.isArray(userSnap.data().events) ? userSnap.data().events : [];
-            existingEvents.push(eventObj);
-            await setDoc(userRef, { events: existingEvents }, { merge: true });
+            await setDoc(userRef, { events: arrayUnion(eventObj) }, { merge: true });
 
             // Update local calendar state
             if (!calendarInstance.events) calendarInstance.events = {};
